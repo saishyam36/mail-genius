@@ -1,12 +1,18 @@
 import React from 'react';
+import Navbar from './components/Navbar';
+import { Routes } from 'react-router-dom';
 
 const App = () => {
 
   return (
-    <>
-    <h1>Hello, React!</h1>
-    <p>Welcome to your new React app.</p>
-    </>
+    <div className="px-4">
+      <Navbar/>
+      {/* <Routes> */}
+        {/* <Route path="/login" element={<Login/>} />
+        <Route path="/create-account" element={<SignUp/>} />
+        <Route path="/" element={<Home/>} /> */}
+      {/* </Routes> */}
+    </div>
   )
 }
 
