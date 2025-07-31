@@ -13,6 +13,8 @@
         0 0.375em 0 0 #dcdcdc, 0 0.425em 0 0 #cacaca, 0 0.425em 0.5em 0 #cecece;
     transition: 0.15s ease;
     cursor: pointer;
+    position: relative;
+    top: -0.25rem;
 }
 
 button:active {
@@ -22,49 +24,128 @@ button:active {
         0 0.2em 0 0 #dcdcdc, 0 0.225em 0 0 #cacaca, 0 0.225em 0.375em 0 #cecece;
 }
 
-.generateButton {
-   font: inherit;
-    border: 0;
-    color: #242424;
-    border-radius: 0.5em;
-    font-size: 1.00rem;
-    padding: 0.2em 1em;
-    font-weight: 600;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    background: #1C1A1C;
+.burger {
+    position: relative;
+    width: 30px;
+    height: 20px;
+    background: transparent;
     cursor: pointer;
-    transition: all 450ms ease-in-out;
+    display: block;
 }
 
-.sparkle {
-    fill: #AAAAAA;
-    width: 1rem;
-    transition: all 800ms ease;
+.burger input {
+    display: none;
 }
 
-.text {
-    font-weight: 500;
-    color: #AAAAAA;
-    font-size: small;
+.burger span {
+    display: block;
+    position: absolute;
+    height: 3px;
+    width: 90%;
+    background: black;
+    border-radius: 9px;
+    opacity: 1;
+    left: 0;
+    transform: rotate(0deg);
+    transition: .25s ease-in-out;
 }
 
-.generateButton:hover {
-    background: linear-gradient(0deg, #A47CF3, #683FEA);
-    box-shadow: inset 0px 1px 0px 0px rgba(255, 255, 255, 0.4),
-        inset 0px -4px 0px 0px rgba(0, 0, 0, 0.2),
-        0px 0px 0px 4px rgba(255, 255, 255, 0.2),
-        0px 0px 180px 0px #9917FF;
-    transform: translateY(-2px);
+.burger span:nth-of-type(1) {
+    top: 0px;
+    transform-origin: left center;
 }
 
-.generateButton:hover .text {
+.burger span:nth-of-type(2) {
+    top: 50%;
+    transform: translateY(-50%);
+    transform-origin: left center;
+}
+
+.burger span:nth-of-type(3) {
+    top: 100%;
+    transform-origin: left center;
+    transform: translateY(-50%);
+}
+
+.burger input:checked~span:nth-of-type(1) {
+    top: 0;
+    left: 4px;
+    transform: rotate(405deg);
+}
+
+.burger input:checked~span:nth-of-type(2) {
+    width: 0%;
+    opacity: 0;
+}
+
+.burger input:checked~span:nth-of-type(3) {
+    top: 16px;
+    left: 4px;
+    transform: rotate(-405deg);
+}
+
+.navMenu {
+    display: none;
+    position: absolute;
+    top: 3.75rem;
+    right: 1.25rem;
+    z-index: 100;
+    flex-direction: column;
+    width: 150px;
+    background-color: #0d1117;
+    justify-content: center;
+    border-radius: 5px;
+}
+
+.navMenu.open {
+    display: flex;
+}
+
+.menuOption {
+    background-color: transparent;
+    border: none;
+    padding: 8px;
     color: white;
+    display: flex;
+    position: relative;
+    gap: 3px;
+    cursor: pointer;
+    border-radius: 4px;
 }
 
-.generateButton:hover .sparkle {
-    fill: white;
-    transform: scale(1.2);
+.menuOption:not(:active):hover,
+.menuOption:focus {
+    background-color: #21262c;
+}
+
+.menuOption:focus,
+.menuOption:active {
+    background-color: #1a1f24;
+    outline: none;
+}
+
+.menuOption::before {
+    content: "";
+    position: absolute;
+    top: 5px;
+    left: -10px;
+    width: 5px;
+    height: 80%;
+    background-color: #2f81f7;
+    border-radius: 5px;
+    opacity: 0;
+}
+
+.menuOption:focus::before,
+.menuOption:active::before {
+    opacity: 1;
+}
+
+.menuOption svg {
+    width: 15px;
+}
+
+#logoutIcon {
+    width: 13px;
+    margin-left: 3px;
 }
