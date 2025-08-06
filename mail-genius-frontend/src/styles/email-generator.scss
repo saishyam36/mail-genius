@@ -1,0 +1,197 @@
+.email-generator-container {
+    padding: 1rem;
+    gap: 2rem;
+    background-color: #f9fafb;
+
+    .input-section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+
+            label {
+                display: block;
+                margin-bottom: 0.25rem;
+                font-weight: 500;
+                font-size: 0.875rem;
+                color: #4a4a4a;
+            }
+
+            input[type="text"],
+            textarea,
+            select {
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid #e0e0e0;
+                border-radius: 6px;
+                font-size: 13px;
+                transition: border-color 0.2s;
+                background: white;
+
+                &:focus {
+                    outline: none;
+                    border-color: #2196f3;
+                }
+            }
+
+            textarea {
+                min-height: 80px;
+                resize: vertical;
+            }
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+
+            span {
+                font-size: 12px;
+                color: #666;
+            }
+
+            .slider {
+                flex: 1;
+                -webkit-appearance: none;
+                appearance: none;
+                height: 3px;
+                background: #e0e0e0;
+                border-radius: 2px;
+                outline: none;
+
+                &::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    width: 14px;
+                    height: 14px;
+                    background: #2196f3;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    transition: background 0.2s;
+
+                    &:hover {
+                        background: #1976d2;
+                    }
+                }
+            }
+        }
+
+        .generate-button {
+            width: 100%;
+            padding: 0.5rem;
+            background: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+
+            &:hover {
+                background: #1976d2;
+            }
+
+            .sparkle {
+                width: 16px;
+                height: 16px;
+            }
+        }
+    }
+
+    .output-section {
+        max-width: 600px;
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+        h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #1a1a1a;
+        }
+
+        .email-output {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            min-height: 200px;
+
+            pre {
+                white-space: pre-wrap;
+                font-family: inherit;
+                margin: 0;
+            }
+        }
+
+        .output-actions {
+            display: flex;
+            gap: 1rem;
+
+            .action-button {
+                padding: 0.375rem 0.75rem;
+                background: white;
+                border: 1px solid #e0e0e0;
+                border-radius: 4px;
+                font-size: 0.875rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                cursor: pointer;
+                transition: background 0.2s;
+
+                &:hover {
+                    background: #f5f5f5;
+                }
+
+                .icon {
+                    font-size: 16px;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 1024px) {
+    .email-generator-container {
+        flex-direction: column;
+
+        .input-section,
+        .output-section {
+            max-width: 100%;
+        }
+    }
+}
+
+@media (min-width: 1024px) {
+    .email-generator-container {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 3rem;
+        justify-content: space-between;
+
+        .input-section,
+        .output-section {
+            max-width: 100%;
+            flex: 1 1 0;
+        }
+    }
+}

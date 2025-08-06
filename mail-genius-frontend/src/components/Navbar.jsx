@@ -8,7 +8,7 @@ export default function Navbar() {
   const isLoggedIn = true; // Set to true if user is logged in
 
   return (
-    <nav className="w-full shadow-md">
+    <nav className="shadow-md">
       <div className="flex items-center justify-between px-6 py-2">
         <img src="/mail-genius-high-resolution-logo-transparent.png" alt="Logo" className="h-10 w-152" />
         <div className="flex justify-end items-center space-x-4">
