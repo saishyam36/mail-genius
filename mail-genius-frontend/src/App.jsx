@@ -1,21 +1,23 @@
-import React from 'react';
-import Navbar from './components/Navbar';
-import { Routes } from 'react-router-dom';
-import EmailGenerator from './pages/Email-Generator';
+import {
+  SidebarInset,
+  SidebarProvider,
+} from "@/components/ui/sidebar"
+import { AppSidebar } from "./components/AppSidebar"
+import { SiteHeader } from "./components/SiteHeader"
+import EmailGenerator from "./pages/Email-Generator"
 
-const App = () => {
-
+export default function Page() {
   return (
-    <div className="px-4 ">
-      <Navbar/>
-      <EmailGenerator />
-      {/* <Routes> */}
-        {/* <Route path="/login" element={<Login/>} />
-        <Route path="/create-account" element={<SignUp/>} />
-        <Route path="/" element={<Home/>} /> */}
-      {/* </Routes> */}
+    <div className="">
+      <SidebarProvider className="flex flex-col">
+        <SiteHeader />
+        <div className="flex flex-1">
+          <AppSidebar />
+          <SidebarInset>
+            <EmailGenerator />
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
     </div>
   )
 }
-
-export default App

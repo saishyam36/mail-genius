@@ -47,7 +47,7 @@ const EmailGenerator = () => {
     // TODO: use shadcn Form and add field validation
 
     return (
-        <div className="email-generator-container mt-4 mb-4">
+        <div className="email-generator-container">
             <Card className="input-section">
                 <CardHeader>
                     <div className="flex items-center justify-between mb-2">
