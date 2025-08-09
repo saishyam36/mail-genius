@@ -25,6 +25,9 @@ const EmailGenerator = () => {
     });
 
     const [generatedEmail, setGeneratedEmail] = useState('');
+    const text_color = formData.context.length >= 300
+        ? 'text-red-500'
+        : 'text-muted-foreground'
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -96,12 +99,7 @@ const EmailGenerator = () => {
                                             className={`resize-none min-h-[6rem] ${formData.context.length > 250 ? 'border-yellow-500' : ''
                                                 } ${formData.context.length >= 300 ? 'border-red-500' : ''}`}
                                         />
-                                        <div className={`absolute bottom-2 right-2 text-xs pointer-events-none ${formData.context.length >= 300
-                                            ? 'text-red-500'
-                                            : formData.context.length > 250
-                                                ? 'text-yellow-500'
-                                                : 'text-muted-foreground'
-                                            }`}>
+                                        <div className={`absolute bottom-2 right-2 text-xs pointer-events-none ${text_color}`}>
                                             {formData.context.length}/300
                                         </div>
                                     </div>
@@ -120,12 +118,7 @@ const EmailGenerator = () => {
                                             className={`resize-none min-h-[6rem] ${formData.data.length > 150 ? 'border-yellow-500' : ''
                                                 } ${formData.data.length >= 200 ? 'border-red-500' : ''}`}
                                         />
-                                        <div className={`absolute bottom-2 right-2 text-xs pointer-events-none ${formData.data.length >= 200
-                                            ? 'text-red-500'
-                                            : formData.data.length > 150
-                                                ? 'text-yellow-500'
-                                                : 'text-muted-foreground'
-                                            }`}>
+                                        <div className={`absolute bottom-2 right-2 text-xs pointer-events-none ${text_color}`}>
                                             {formData.data.length}/200
                                         </div>
                                     </div>

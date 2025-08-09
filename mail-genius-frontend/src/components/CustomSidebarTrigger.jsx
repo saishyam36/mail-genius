@@ -5,7 +5,7 @@ import { useSidebar } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
 
 
-export function CustomSidebarTrigger({ className, ...props }) {
+export function CustomSidebarTrigger({...props }) {
   const { toggleSidebar, state } = useSidebar()
 
   return (
@@ -13,10 +13,7 @@ export function CustomSidebarTrigger({ className, ...props }) {
       data-sidebar="trigger"
       variant="ghost"
       size="icon"
-      className={cn(
-        "absolute -right-3 top-3 z-20 h-6 w-6 rounded-full border bg-background shadow-md hover:bg-accent",
-        className,
-      )}
+      className="absolute -right-3 top-1 z-20 h-6 w-6 rounded-full border bg-background shadow-md hover:bg-accent"
       onClick={(event) => {
         props.onClick?.(event)
         toggleSidebar()
