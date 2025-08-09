@@ -1,19 +1,13 @@
-import * as React from "react"
+import React from 'react';
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
   GalleryVerticalEnd,
-  Map,
-  PieChart,
   Settings2,
-  SquareTerminal,
+  MailIcon,
+  WandSparklesIcon,
 } from "lucide-react"
 
-import { NavMain } from "@/components/NavMain"
-// import { NavUser } from "@/components/nav-user"
+import { NavMain } from "@/components/NavMain.jsx"
+import { NavUser } from "@/components/NavUser.jsx"
 import {
   Sidebar,
   SidebarContent,
@@ -24,29 +18,29 @@ import { CustomSidebarTrigger } from "./CustomSidebarTrigger"
 
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    name: "Shyam",
+    email: "shyam@gmail.com",
+    avatar: "https://ui.shadcn.com/avatars/shadcn.jpg",
   },
   navMain: [
     {
-      title: "Playground",
+      title: "Email Generator",
       url: "#",
-      icon: SquareTerminal,
+      icon: WandSparklesIcon,
       isActive: true,
     },
     {
-      title: "Models",
+      title: "Mailbox",
       url: "#",
-      icon: Bot,
+      icon: MailIcon,
     },
     {
-      title: "Documentation",
+      title: "Templates",
       url: "#",
-      icon: BookOpen,
+      icon: GalleryVerticalEnd,
     },
     {
-      title: "Settings",
+      title: "Configuration",
       url: "#",
       icon: Settings2,
     },
@@ -64,7 +58,7 @@ export function AppSidebar({ ...props }) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        {/* <NavUser user={data.user} /> */}
+        <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>
   )

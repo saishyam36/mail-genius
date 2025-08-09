@@ -1,3 +1,4 @@
+import React from 'react';
 // import {
 //   Breadcrumb,
 //   BreadcrumbItem,
@@ -27,7 +28,7 @@ export function SiteHeader() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <SearchForm className="w-full sm:ml-auto sm:w-auto" /> */}
+      */}
             </div>
         </header>
     )
