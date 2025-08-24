@@ -19,7 +19,7 @@ export default function Page() {
           <SidebarInset>
             <Routes>
               <Route path="/" element={<EmailGenerator />} />
-              {/* The :id is now optional to allow showing the list and content together */}
+              <Route path="/email/inbox" element={<EmailInbox />} />
               <Route path="/email/inbox/:id?" element={<EmailInbox />} />
               {/* <Route path="/templates" element={<Templates />} /> */}
               {/* <Route path="/settings" element={<Settings />} /> */}
