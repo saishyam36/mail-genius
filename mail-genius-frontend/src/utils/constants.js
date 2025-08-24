@@ -1,10 +1,3 @@
-import {
-  GalleryVerticalEnd,
-  Settings2,
-  MailIcon,
-  WandSparklesIcon,
-} from "lucide-react"
-
 export const EMAIL_GENERATOR = {
     TITLE: 'Generate Email',
     DESCRIPTION: 'Fill in the details below to generate your email content.',
@@ -42,34 +35,3 @@ export const EMAIL_GENERATOR = {
         EDIT: '✏️',
     },
 };
-
-export const SIDEBAR = {
-    user: {
-        name: "Shyam",
-        email: "shyam@gmail.com",
-        avatar: "https://ui.shadcn.com/avatars/shadcn.jpg",
-    },
-    navMain: [
-        {
-            title: "Email Generator",
-            url: "#",
-            icon: WandSparklesIcon,
-            isActive: true,
-        },
-        {
-            title: "Mailbox",
-            url: "#",
-            icon: MailIcon,
-        },
-        {
-            title: "Templates",
-            url: "#",
-            icon: GalleryVerticalEnd,
-        },
-        {
-            title: "Configuration",
-            url: "#",
-            icon: Settings2,
-        },
-    ],
-}

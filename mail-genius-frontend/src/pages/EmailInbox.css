@@ -1,0 +1,131 @@
+.email-inbox-container-split {
+  display: flex;
+  height: calc(100vh - 65px); /* Adjust based on your header's height */
+  background-color: #f9fafb;
+}
+
+.email-list-pane {
+  width: 350px;
+  min-width: 300px;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.inbox-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.inbox-header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.inbox-header p {
+  color: #6b7280;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.email-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.email-item {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.email-link {
+  display: block;
+  padding: 1rem;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.email-item:hover .email-link {
+  background-color: #f3f4f6;
+}
+
+.email-item.selected .email-link {
+  background-color: #e5e7eb;
+}
+
+.email-item.unread .sender-name,
+.email-item.unread .email-subject {
+  font-weight: bold;
+  color: #111827;
+}
+
+.sender-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.sender-name {
+  font-weight: 500;
+}
+
+.email-date {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.email-subject {
+  margin-bottom: 0.25rem;
+}
+
+.email-content-preview {
+  font-size: 0.875rem;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.email-content-pane {
+  flex-grow: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  background-color: #ffffff;
+}
+
+.email-content-header {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.email-content-sender-info {
+  display: flex;
+  justify-content: space-between;
+  color: #6b7280;
+  margin-top: 0.5rem;
+}
+
+.email-content-body {
+  line-height: 1.6;
+  white-space: pre-wrap; /* Respects newlines in the content */
+}
+
+.no-email-selected {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #6b7280;
+  font-size: 1.25rem;
+}

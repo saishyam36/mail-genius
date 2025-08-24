@@ -5,7 +5,9 @@ import {
 } from "@/components/ui/sidebar"
 import { AppSidebar } from "./components/AppSidebar"
 import { SiteHeader } from "./components/SiteHeader"
-import EmailGenerator from "./pages/Email-Generator"
+import EmailGenerator from "./pages/EmailGenerator"
+import EmailInbox from './pages/EmailInbox.jsx';
+import { Route, Routes } from 'react-router-dom'
 
 export default function Page() {
   return (
@@ -15,7 +17,13 @@ export default function Page() {
         <div className="flex flex-1">
           <AppSidebar />
           <SidebarInset>
-            <EmailGenerator />
+            <Routes>
+              <Route path="/" element={<EmailGenerator />} />
+              {/* The :id is now optional to allow showing the list and content together */}
+              <Route path="/email/inbox/:id?" element={<EmailInbox />} />
+              {/* <Route path="/templates" element={<Templates />} /> */}
+              {/* <Route path="/settings" element={<Settings />} /> */}
+            </Routes>
           </SidebarInset>
         </div>
       </SidebarProvider>

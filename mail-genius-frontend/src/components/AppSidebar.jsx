@@ -8,7 +8,43 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar"
 import { CustomSidebarTrigger } from "./CustomSidebarTrigger"
-import { SIDEBAR } from '@/utils/constants';
+import {
+  GalleryVerticalEnd,
+  Settings2,
+  MailIcon,
+  WandSparklesIcon,
+} from "lucide-react"
+
+const SIDEBAR = {
+    user: {
+        name: "Shyam",
+        email: "shyam@gmail.com",
+        avatar: "https://ui.shadcn.com/avatars/shadcn.jpg",
+    },
+    navMain: [
+        {
+            title: "Email Generator",
+            url: "/",
+            icon: WandSparklesIcon,
+            isActive: true,
+        },
+        {
+            title: "Mailbox",
+            url: "/email/inbox",
+            icon: MailIcon,
+        },
+        {
+            title: "Templates",
+            url: "/templates",
+            icon: GalleryVerticalEnd,
+        },
+        {
+            title: "Configuration",
+            url: "/configuration",
+            icon: Settings2,
+        },
+    ],
+}
 
 export function AppSidebar({ ...props }) {
   return (
