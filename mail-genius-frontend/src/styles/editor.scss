@@ -1,0 +1,115 @@
+.editor-shell {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  font-family: sans-serif; /* Added for consistency */
+}
+
+.toolbar {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.toolbar button {
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-right: 8px;
+  border-radius: 4px;
+}
+
+.toolbar button.active {
+  background-color: #f0f0f0;
+}
+
+.editor-container {
+  position: relative;
+  padding: 12px;
+}
+
+.editor-input {
+  min-height: 120px;
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  resize: none;
+  background-color: transparent;
+  line-height: 1.5;
+}
+
+.editor-placeholder {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  color: #999;
+  pointer-events: none;
+  user-select: none;
+}
+
+.editor-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #e0e0e0;
+  border-bottom-left-radius: 8px; /* Rounded corners */
+  border-bottom-right-radius: 8px; /* Rounded corners */
+}
+
+.tip {
+  font-size: 12px;
+  color: #666;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.actions button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+/* Styles for lists */
+.editor-input ul, .editor-input ol {
+  padding-left: 20px; /* Add indentation for lists */
+  margin-block-start: 8px; /* Add space above the list */
+  margin-block-end: 8px; /* Add space below the list */
+}
+
+/* Style for bullet points */
+.editor-input ul {
+  list-style-type: disc;
+}
+
+/* Style for numbered lists */
+.editor-input ol {
+  list-style-type: decimal;
+}
+
+/* Style for individual list items */
+.editor-input li {
+  margin-bottom: 4px;
+}
+
+/* --- ADD THIS STYLE FOR THE TOOLBAR DIVIDER --- */
+.toolbar .divider {
+  display: inline-block;
+  width: 1px;
+  background-color: #e0e0e0;
+  margin: 0 8px;
+  height: 20px;
+  vertical-align: middle;
+}
+

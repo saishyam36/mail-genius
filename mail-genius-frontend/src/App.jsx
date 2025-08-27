@@ -8,23 +8,25 @@ import { SiteHeader } from "./components/SiteHeader"
 import EmailGenerator from "./pages/EmailGenerator"
 import EmailInbox from './pages/EmailInbox.jsx';
 import { Route, Routes } from 'react-router-dom'
+import EmailInboxProvider from './contexts/EmailInboxContext';
 
 export default function Page() {
   return (
-    <div className="">
-      <SidebarProvider className="flex flex-col">
+    <div className="h-screen">
+      <SidebarProvider className="flex flex-col h-full">
         <SiteHeader />
-        <div className="flex flex-1">
+        <div className="flex flex-1 overflow-hidden">
           <AppSidebar />
-          <SidebarInset>
-            <Routes>
-              <Route path="/" element={<EmailGenerator />} />
-              <Route path="/email/inbox" element={<EmailInbox />} />
-              <Route path="/email/inbox/:id?" element={<EmailInbox />} />
-              {/* <Route path="/templates" element={<Templates />} /> */}
-              {/* <Route path="/settings" element={<Settings />} /> */}
-            </Routes>
-          </SidebarInset>
+          <EmailInboxProvider>
+            <SidebarInset className="h-full">
+              <Routes>
+                <Route path="/" element={<EmailGenerator />} />
+                <Route path="/email/inbox" element={<EmailInbox />} />
+                {/* <Route path="/templates" element={<Templates />} /> */}
+                {/* <Route path="/settings" element={<Settings />} /> */}
+              </Routes>
+            </SidebarInset>
+          </EmailInboxProvider>
         </div>
       </SidebarProvider>
     </div>
