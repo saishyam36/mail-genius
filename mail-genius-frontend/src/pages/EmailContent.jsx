@@ -103,7 +103,7 @@ const EmailContent = () => {
             </DropdownMenu>
           </div>
           <Separator />
-          <div className="flex flex-1 flex-col">
+          <div className="flex flex-1 flex-col overflow-y-auto">
             <div className="flex items-start p-4">
               <div className="flex items-start gap-4 text-sm">
                 <Avatar>

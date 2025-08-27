@@ -174,7 +174,7 @@ const RichTextEditor = ({ onSend, onCancel }) => {
     <LexicalComposer initialConfig={initialConfig}>
       <div className="editor-shell">
         <ToolbarPlugin />
-        <div className="editor-container">
+        <div className="editor-container overflow-y-auto max-h-40">
           <RichTextPlugin
             contentEditable={<ContentEditable className="editor-input" />}
             placeholder={<div className="editor-placeholder">Type your reply...</div>}
