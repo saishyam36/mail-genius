@@ -51,7 +51,9 @@ const EmailGenerator = () => {
 
     return (
         <div className="email-generator-container">
-            <Card className="input-section">
+            <Card className="input-section z-10" style={{
+                background: "radial-gradient(125% 125% at 50% 70%, #fff 40%, #6b7280 100%)",
+            }}>
                 <CardHeader>
                     <div className="flex items-center justify-between mb-2">
                         <CardTitle>{EMAIL_GENERATOR.TITLE}</CardTitle>
@@ -176,8 +178,9 @@ const EmailGenerator = () => {
                     </form>
                 </CardContent>
             </Card>
-
-            <Card className="output-section">
+            <Card className="output-section z-10" style={{
+                background: "radial-gradient(125% 125% at 50% 70%, #fff 40%, #6b7280 100%)",
+            }}>
                 <CardHeader>
                     <CardTitle>{EMAIL_GENERATOR.OUTPUT_TITLE}</CardTitle>
                 </CardHeader>
@@ -202,7 +205,19 @@ const EmailGenerator = () => {
                 </CardFooter>
             </Card>
         </div>
+
     );
 }
 
+
 export default EmailGenerator;
+<div className="min-h-screen w-full relative">
+  {/* Radial Gradient Background from Bottom */}
+  <div
+    className="absolute inset-0 z-0"
+    style={{
+      background: "radial-gradient(125% 125% at 50% 90%, #fff 40%, #475569 100%)",
+    }}
+  />
+  {/* Your Content/Components */}
+</div>

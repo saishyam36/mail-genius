@@ -20,18 +20,20 @@ import {
   KEY_DOWN_COMMAND,
   COMMAND_PRIORITY_LOW,
   $getRoot,
+  $createParagraphNode,
+  $createTextNode,
 } from 'lexical';
 import '@/styles/editor.scss';
 import { Button } from './ui/button';
 // Import new icons
-import { Send, List, ListOrdered, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
+import { Send, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, Sparkles, SpellCheck } from 'lucide-react';
 
 // Toolbar Plugin as an arrow function
-const ToolbarPlugin = () => {
+const ToolbarPlugin = ({ onMagicReply, onRefineClick }) => {
   const [editor] = useLexicalComposerContext();
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
-    // Add state for list types
+  // Add state for list types
   const [isUl, setIsUl] = useState(false);
   const [isOl, setIsOl] = useState(false);
 
@@ -109,6 +111,17 @@ const ToolbarPlugin = () => {
       <button onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right')} aria-label="Align Right">
         <AlignRight className="h-4 w-4" />
       </button>
+      <span className="divider" />
+      {/* --- Other Buttons --- */}
+
+      <Button variant="secondary" size="sm" onClick={() => onMagicReply(editor)} className="">
+        <Sparkles className="h-4 w-4 mr-1" />
+        <span className='bg-gradient-to-l from-indigo-500 via-red-500 to-blue-500 text-transparent bg-clip-text'>Magic Reply</span>
+      </Button>
+      <Button variant="outline" size="sm" onClick={() => onRefineClick(editor)} className="">
+        <SpellCheck className="h-4 w-4 mr-1" />
+        <span className='bg-gradient-to-l from-indigo-500 via-red-500 to-blue-500 text-transparent bg-clip-text'>AI Refine</span>
+      </Button>
     </div>
   );
 };
@@ -153,8 +166,27 @@ const ActionsPlugin = ({ onSend, onCancel, hasContent }) => {
   );
 };
 
+// Plugin to set initial content
+const SetInitialContentPlugin = ({ initialContent }) => {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    if (initialContent) {
+      editor.update(() => {
+        const root = $getRoot();
+        root.clear();
+        const paragraph = $createParagraphNode();
+        paragraph.append($createTextNode(initialContent));
+        root.append(paragraph);
+      });
+    }
+  }, [editor, initialContent]);
+
+  return null;
+};
+
 // Main Editor Component
-const RichTextEditor = ({ onSend, onCancel }) => {
+const RichTextEditor = ({ onSend, onCancel, onMagicReply, onRefineClick, initialContent }) => {
   const [hasContent, setHasContent] = useState(false);
   const initialConfig = {
     namespace: 'MyRichTextEditor',
@@ -173,7 +205,7 @@ const RichTextEditor = ({ onSend, onCancel }) => {
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <div className="editor-shell">
-        <ToolbarPlugin />
+        <ToolbarPlugin onMagicReply={onMagicReply} onRefineClick={onRefineClick} />
         <div className="editor-container overflow-y-auto max-h-40">
           <RichTextPlugin
             contentEditable={<ContentEditable className="editor-input" />}
@@ -190,6 +222,7 @@ const RichTextEditor = ({ onSend, onCancel }) => {
             });
           }} />
           <SendWithKeybindPlugin onSend={handleSend} />
+          <SetInitialContentPlugin initialContent={initialContent} />
         </div>
         <ActionsPlugin onSend={handleSend} onCancel={onCancel} hasContent={hasContent} />
       </div>
