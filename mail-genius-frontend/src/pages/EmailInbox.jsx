@@ -7,11 +7,50 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import EmailContent from "./EmailContent";
 import { EmailInboxContext } from "@/contexts/EmailInboxContext";
+import { useAuth } from '../auth/AuthProvider'; // Import useAuth
+import { listEmails, getEmailDetails, parseEmailContent } from '../services/gmail-services'; // Import Gmail services
 
 const EmailInbox = () => {
   const { emails, setEmails, setSelectedEmail, selectedEmail } = useContext(EmailInboxContext);
+  const { accessToken, loading: authLoading } = useAuth(); // Get accessToken and authLoading from AuthContext
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [inboxLoading, setInboxLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchAndSetEmails = async () => {
+      if (authLoading || !accessToken) {
+        setInboxLoading(false);
+        return;
+      }
+
+      setInboxLoading(true);
+      setError(null);
+      try {
+        const messagesResponse = await listEmails(accessToken);
+        const messageIds = messagesResponse.map(msg => msg.id);
+
+        const detailedEmailsPromises = messageIds.map(async (messageId) => {
+          const details = await getEmailDetails(accessToken, messageId);
+          return parseEmailContent(details);
+        });
+
+        const detailedEmails = await Promise.all(detailedEmailsPromises);
+        setEmails(detailedEmails);
+        if (detailedEmails.length > 0 && !selectedEmail) {
+          setSelectedEmail(detailedEmails[0]);
+        }
+      } catch (err) {
+        console.error("Failed to fetch emails:", err);
+        setError("Failed to load emails. Please try again later.");
+      } finally {
+        setInboxLoading(false);
+      }
+    };
+
+    fetchAndSetEmails();
+  }, [accessToken, authLoading, setEmails, setSelectedEmail]); // Re-run when accessToken or authLoading changes
 
   // Effect to handle initial load or invalid ID
   useEffect(() => {
@@ -21,7 +60,8 @@ const EmailInbox = () => {
   }, [emails, selectedEmail, setSelectedEmail]);
 
   const handleSelectEmail = (email) => {
-    if (!email.read) {
+    // Mark email as read if it's not already
+    if (email.id && !email.read) {
       setEmails(
         emails.map((e) => (e.id === email.id ? { ...e, read: true } : e))
       );
@@ -33,11 +73,23 @@ const EmailInbox = () => {
     if (!searchTerm) return emails;
     return emails.filter(
       (email) =>
-        email.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        email.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        email.text.toLowerCase().includes(searchTerm.toLowerCase())
+        (email?.from.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (email?.subject.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (email?.body.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   }, [emails, searchTerm]);
+
+  if (authLoading || inboxLoading) {
+    return <div className="flex items-center justify-center h-full">Loading emails...</div>;
+  }
+
+  if (error) {
+    return <div className="flex items-center justify-center h-full text-red-500">{error}</div>;
+  }
+
+  if (!accessToken) {
+    return <div className="flex items-center justify-center h-full text-gray-500">Please log in to view your inbox.</div>;
+  }
 
   return (
     <div className="flex h-full flex-row">
@@ -86,76 +138,73 @@ const EmailInbox = () => {
                   onClick={() => handleSelectEmail(item)}
                 >
                   <div className="flex w-full flex-col gap-1">
-                    <div className="flex items-center">
-                      <div className="flex items-center gap-2">
-                        <div className="font-semibold">{item.name}</div>
-                        {!item.read && (
-                          <span className="flex h-2 w-2 rounded-full bg-blue-600" />
-                        )}
-                      </div>
+                    <div className="flex items-center space-x-2"> {/* Added space-x-2 for spacing */}
+                      <div className="font-semibold truncate flex-1 min-w-0">{item.from}</div> {/* Added truncate and flex-1 min-w-0 */}
+                      {/* Gmail API doesn't directly provide a 'read' status in the initial message list,
+                          you'd typically check labels for UNREAD. For now, we'll assume all fetched are unread
+                          or implement a more complex check if needed. */}
+                      {!item.read && (
+                        <span className="flex h-2 w-2 rounded-full bg-blue-600" />
+                      )}
                       <div
                         className={cn(
-                          "ml-auto text-xs",
+                          "text-xs whitespace-nowrap", // Added whitespace-nowrap to prevent date from wrapping
                           selectedEmail && selectedEmail.id === item.id
                             ? "text-foreground"
                             : "text-muted-foreground"
                         )}
                       >
-                        {item.date}
+                        {item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}
                       </div>
                     </div>
-                    <div className="text-xs font-medium">{item.subject}</div>
-                  </div>
-                  <div className="line-clamp-2 text-xs text-muted-foreground">
-                    {item.text.substring(0, 300)}
+                    <div className="text-xs font-medium truncate">{item.subject || '(No Subject)'}</div> {/* Added truncate */}
                   </div>
                 </button>
               ))}
+              {filteredEmails.length === 0 && <p className="p-4 text-center text-muted-foreground">No emails found.</p>}
             </div>
           </TabsContent>
           <TabsContent value="unread" className="m-0 flex-1 overflow-y-auto">
             <div className="flex flex-col gap-2 p-4 pt-0">
-              {filteredEmails
-                .filter((item) => !item.read)
-                .map((item) => (
-                  <button
-                    key={item.id}
-                    className={cn(
-                      "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
-                      selectedEmail &&
-                      selectedEmail.id === item.id &&
-                      "bg-muted"
-                    )}
-                    onClick={() => handleSelectEmail(item)}
-                  >
-                    <div className="flex w-full flex-col gap-1">
-                      <div className="flex items-center">
-                        <div className="flex items-center gap-2">
-                          <div className="font-semibold">{item.name}</div>
-                          {!item.read && (
-                            <span className="flex h-2 w-2 rounded-full bg-blue-600" />
-                          )}
-                        </div>
-                        <div
-                          className={cn(
-                            "ml-auto text-xs",
-                            selectedEmail && selectedEmail.id === item.id
-                              ? "text-foreground"
-                              : "text-muted-foreground"
-                          )}
-                        >
-                          {item.date}
-                        </div>
-                      </div>
-                      <div className="text-xs font-medium">
-                        {item.subject}
+              {/* For unread, you'd need to filter based on Gmail labels.
+                  For simplicity, we'll show all emails here for now. */}
+              {filteredEmails.map((item) => (
+                <button
+                  key={item.id}
+                  className={cn(
+                    "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
+                    selectedEmail && selectedEmail.id === item.id && "bg-muted"
+                  )}
+                  onClick={() => handleSelectEmail(item)}
+                >
+                  <div className="flex w-full flex-col gap-1">
+                    <div className="flex items-center space-x-2"> {/* Added space-x-2 for spacing */}
+                      <div className="font-semibold truncate flex-1 min-w-0">{item.from}</div> {/* Added truncate and flex-1 min-w-0 */}
+                      {/* Gmail API doesn't directly provide a 'read' status in the initial message list,
+                          you'd typically check labels for UNREAD. For now, we'll assume all fetched are unread
+                          or implement a more complex check if needed. */}
+                      {!item.read && (
+                        <span className="flex h-2 w-2 rounded-full bg-blue-600" />
+                      )}
+                      <div
+                        className={cn(
+                          "text-xs whitespace-nowrap", // Added whitespace-nowrap to prevent date from wrapping
+                          selectedEmail && selectedEmail.id === item.id
+                            ? "text-foreground"
+                            : "text-muted-foreground"
+                        )}
+                      >
+                        {item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}
                       </div>
                     </div>
-                    <div className="line-clamp-2 text-xs text-muted-foreground">
-                      {item.text.substring(0, 300)}
-                    </div>
-                  </button>
-                ))}
+                    <div className="text-xs font-medium truncate">{item.subject || '(No Subject)'}</div> {/* Added truncate */}
+                  </div>
+                  <div className="line-clamp-2 text-xs text-muted-foreground">
+                    {item.body ? item.body.substring(0, 300) : '(No content)'}
+                  </div>
+                </button>
+              ))}
+              {filteredEmails.length === 0 && <p className="p-4 text-center text-muted-foreground">No emails found.</p>}
             </div>
           </TabsContent>
         </Tabs>
