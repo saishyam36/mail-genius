@@ -45,7 +45,6 @@ const EmailContent = () => {
       setEmailContentLoading(true);
       setEmailContentError(null);
       try {
-        console.log("Fetching full details for email ID:", selectedEmail.id);
         const details = await getEmailDetails(accessToken, selectedEmail.id, 'full');
         const parsedDetails = parseEmailContent(details);
         setFullEmailDetails(parsedDetails);

@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 
@@ -9,13 +9,39 @@ export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const accessTokenTimerRef = useRef(null);
+
+  const clearAccessTokenTimer = () => {
+    if (accessTokenTimerRef.current) {
+      clearTimeout(accessTokenTimerRef.current);
+      accessTokenTimerRef.current = null;
+    }
+  };
+
+  const logout = React.useCallback(() => {
+    setAccessToken(null);
+    setUser(null);
+    localStorage.removeItem('google_access_token');
+    localStorage.removeItem('user_info');
+    clearAccessTokenTimer(); // Clear timer on logout
+    // Potentially revoke token on Google's side if needed
+  }, []);
+
+  const setAccessTokenWithExpiration = (token, expiresIn) => {
+    setAccessToken(token);
+    localStorage.setItem('google_access_token', token);
+    clearAccessTokenTimer(); // Clear any existing timer
+
+    // Set a new timer to remove the token when it expires
+    accessTokenTimerRef.current = setTimeout(() => {
+      console.log('Access token expired. Logging out.');
+      logout();
+    }, expiresIn * 1000); // expiresIn is in seconds, convert to milliseconds
+  };
 
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
-      console.log("Login Success:", tokenResponse);
-      setAccessToken(tokenResponse.access_token);
-      localStorage.setItem('google_access_token', tokenResponse.access_token);
-
+      setAccessTokenWithExpiration(tokenResponse.access_token, tokenResponse.expires_in);
       (async () => {
         try {
           const userInfoResponse = await axios.get(
@@ -34,30 +60,30 @@ export const AuthProvider = ({ children }) => {
       console.log('Login Failed:', error);
       setAccessToken(null);
       setUser(null);
+      clearAccessTokenTimer(); // Clear timer on login failure
     },
     scope: 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
   });
-
-  const logout = React.useCallback(() => {
-    setAccessToken(null);
-    setUser(null);
-    localStorage.removeItem('google_access_token');
-    localStorage.removeItem('user_info');
-    // Potentially revoke token on Google's side if needed
-  }, []);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('google_access_token');
     const storedUser = localStorage.getItem('user_info');
 
     if (storedToken) {
+      // If a token is stored, we assume it's still valid for now.
+      // In a real app, you might store the expiration time along with the token
+      // and use it to set the timer here. For now, the token will be
+      // considered valid until an API call fails or manual logout.
       setAccessToken(storedToken);
-      // Optionally verify token validity with Google here
     }
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
     setLoading(false);
+
+    return () => {
+      clearAccessTokenTimer(); // Cleanup timer on component unmount
+    };
   }, []);
 
   const contextValue = React.useMemo(

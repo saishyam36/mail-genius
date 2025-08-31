@@ -60,7 +60,6 @@ export const parseEmailContent = (message) => {
 
   emailPayload.headers.forEach(header => {
      headers[header.name] = header.value;
-     console.log(`Header: ${header.name} => ${header.value}`);
   });
 
   const getParts = (parts) => {
