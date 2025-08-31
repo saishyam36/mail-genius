@@ -23,6 +23,10 @@ export const EMAIL_GENERATOR = {
         { value: 'Casual', label: 'Casual' },
         { value: 'Friendly', label: 'Friendly' },
         { value: 'Formal', label: 'Formal' },
+        { value: 'Urgent', label: 'Urgent' },
+        { value: 'Persuasive', label: 'Persuasive' },
+        { value: 'Apologetic', label: 'Apologetic' },
+        { value: 'Congratulatory', label: 'Congratulatory' },
     ],
 
     CREATIVITY_LABELS: {

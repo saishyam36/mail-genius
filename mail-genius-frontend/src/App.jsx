@@ -12,6 +12,7 @@ import EmailInbox from './pages/EmailInbox.jsx';
 import Login from './pages/Login.jsx';
 import { Route, Routes, Navigate } from 'react-router-dom'
 import EmailInboxProvider from './contexts/EmailInboxContext';
+import { EmailAiProvider } from './contexts/EmailAiContext';
 
 // New component to encapsulate authenticated content
 function AuthAppContent() {
@@ -27,21 +28,23 @@ function AuthAppContent() {
       <div className="flex flex-1 overflow-hidden">
         <AppSidebar />
         <EmailInboxProvider>
-          <SidebarInset className="h-full">
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route
-                path="/"
-                element= <EmailGenerator />
-              />
-              <Route
-                path="/email/inbox"
-                element={accessToken ? <EmailInbox /> : <Navigate to="/login" />}
-              />
-              {/* <Route path="/templates" element={<Templates />} /> */}
-              {/* <Route path="/settings" element={<Settings />} /> */}
-            </Routes>
-          </SidebarInset>
+          <EmailAiProvider>
+            <SidebarInset className="h-full">
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route
+                  path="/"
+                  element= <EmailGenerator />
+                />
+                <Route
+                  path="/email/inbox"
+                  element={accessToken ? <EmailInbox /> : <Navigate to="/login" />}
+                />
+                {/* <Route path="/templates" element={<Templates />} /> */}
+                {/* <Route path="/settings" element={<Settings />} /> */}
+              </Routes>
+            </SidebarInset>
+          </EmailAiProvider>
         </EmailInboxProvider>
       </div>
     </SidebarProvider>
