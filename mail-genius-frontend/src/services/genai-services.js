@@ -44,6 +44,8 @@ Email Structure REQUIREMENTS:
     const generationConfig = {
         maxOutputTokens: 47312,
         topP: 0.4,
+        presence_penalty: 0.5,
+        frequency_penalty: 0.3,
         safetySettings: [
             {
                 category: 'HARM_CATEGORY_HATE_SPEECH',
@@ -69,8 +71,11 @@ Email Structure REQUIREMENTS:
         },
     };
 
+    // Use these parameters later
+    // - Additional Context: ${formData.additionalContext || 'None'}
+    // - Key Points to Address: ${formData.keyPoints || 'Address all points from original message'}
+    // - Sender Relationship: ${formData.senderRelationship || 'Professional colleague'}
     const userPrompt = `Generate a email based on the following parameters:
-
 **EMAIL PARAMETERS:**
 - Subject: ${formData.subject}
 - Context: ${formData.context || '-'}
@@ -102,6 +107,198 @@ Generate the email now:`;
         return result.text;
     } catch (error) {
         console.error("Error generating content from AI:", error);
+        throw error;
+    }
+}
+
+export async function generateReply(previousMessage, replyContext = {}) {
+    const systemInstructions = {
+        text: `You are an expert email reply assistant designed to generate appropriate responses to incoming emails. Your goal is to create contextually relevant, professional replies that address the sender's points effectively.
+
+CORE PRINCIPLES:
+- Analyze the previous message thoroughly to understand intent and key points
+- Generate appropriate responses that address all important elements
+- Match the tone and formality level of the original message
+- Ensure replies are concise yet comprehensive
+- Include proper email etiquette and structure
+- Provide actionable responses when appropriate
+
+REPLY GUIDELINES:
+- Acknowledge receipt and key points from the original message
+- Address questions or requests directly
+- Provide necessary information or next steps
+- Match the sender's communication style and tone
+- Keep responses focused and relevant
+- Include appropriate closing remarks
+
+Email Structure REQUIREMENTS:
+- Include proper email greeting appropriate to relationship level
+- Don't Add subject line in reply
+- Structure content logically with clear paragraphs
+- End with professional closing
+- Ensure all important points from original message are addressed`
+    };
+
+    const generationConfig = {
+        temperature: 0.3,
+        maxOutputTokens: 36000,
+        topP: 0.4,
+        seed: 2,
+        safetySettings: [
+            {
+                category: 'HARM_CATEGORY_HATE_SPEECH',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+            },
+            {
+                category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+            },
+            {
+                category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+                threshold: 'BLOCK_LOW_AND_ABOVE',
+            },
+            {
+                category: 'HARM_CATEGORY_HARASSMENT',
+                threshold: 'BLOCK_LOW_AND_ABOVE',
+            }
+        ],
+        response_mime_type: "application/text",
+        systemInstruction: {
+            parts: [systemInstructions]
+        },
+    };
+
+    const userPrompt = `Generate a reply to the following email message:
+
+**PREVIOUS MESSAGE:**
+${previousMessage}
+
+**REPLY CONTEXT:**
+- Urgency Level: ${replyContext?.urgency || 'Normal'}
+- Relationship: ${replyContext?.senderRelationship || 'Professional'}
+- To: ${replyContext?.senderName || 'Valued Contact'}
+- From: ${replyContext?.receiverName || 'Name'}
+
+**INSTRUCTIONS:**
+1. Carefully analyze the previous message to understand the sender's intent, questions, and key points
+2. Generate a complete reply that addresses all important elements from the original message
+3. Match the appropriate tone and formality level based on the previous message tone
+4. Include relevant information and next steps if applicable
+5. Ensure the reply is helpful, clear, and actionable
+6. Format the reply properly with a greeting, body, and closing. Do not include a subject line.
+
+**REPLY:**`;
+
+    const req = {
+        model: model,
+        contents: [
+            { role: 'user', parts: [{ text: userPrompt }] }
+        ],
+        generationConfig,
+    };
+
+    try {
+        const result = await ai.models.generateContent(req);
+        return result.text;
+    } catch (error) {
+        console.error("Error generating reply from AI:", error);
+        throw error;
+    }
+}
+
+export async function refineEmailGrammar(emailContent, senderName = '', receiverName = '') {
+    const systemInstructions = {
+        text: `You are an expert grammar and style editor specialized in email communication. Your goal is to improve the grammatical accuracy, clarity, and flow of emails while preserving the original meaning, tone, and intent completely.
+
+CORE PRINCIPLES:
+- NEVER change the meaning or intent of the original message
+- Preserve the original tone and style as much as possible
+- Fix grammatical errors, typos, and awkward phrasing
+- Improve sentence structure and flow for better readability
+- Maintain the same level of formality
+- Keep all original key points and information intact
+- Preserve the email structure (subject, greeting, body, closing)
+
+EDITING GUIDELINES:
+- Fix spelling, punctuation, and grammatical errors
+- Improve sentence structure without changing meaning
+- Enhance clarity and readability
+- Correct verb tenses and agreement issues
+- Fix awkward phrasing while maintaining voice
+- Improve transitions between sentences/paragraphs
+- Ensure consistent style throughout
+
+WHAT NOT TO CHANGE:
+- Core message content or meaning
+- Specific data, numbers, dates, or facts
+- The sender's intended tone or style
+- Key terminology or technical terms
+- Call-to-actions or requests
+- Email structure or format decisions`
+    };
+
+    const generationConfig = {
+        maxOutputTokens: 47312,
+        topP: 0.2,
+        safetySettings: [
+            {
+                category: 'HARM_CATEGORY_HATE_SPEECH',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+            },
+            {
+                category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+            },
+            {
+                category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+                threshold: 'BLOCK_LOW_AND_ABOVE',
+            },
+            {
+                category: 'HARM_CATEGORY_HARASSMENT',
+                threshold: 'BLOCK_LOW_AND_ABOVE',
+            }
+        ],
+        response_mime_type: "application/text",
+        systemInstruction: {
+            parts: [systemInstructions]
+        },
+        temperature: 0.1, // Very low temperature for consistent, conservative edits
+    };
+
+    const userPrompt = `You are an AI email refiner. Your only job is to correct the grammar and improve the clarity of the text provided to you:
+
+**EMAIL DETAILS:**
+To: ${senderName}
+From: ${receiverName}
+
+**EMAIL TO REFINE:**
+${emailContent}
+
+**INSTRUCTIONS:**
+1.  Correct all grammar, spelling, and punctuation errors.
+2.  Maintain the original meaning, tone, and all factual information.
+3.  If a salutation or signature of email is missing, add a standard one.
+4. Maintain the original tone and style
+5. Keep all factual information, data, and key points exactly the same
+6. Preserve the email's structure and format
+7. **Your output must ONLY be the refined email text.** Do not add any introductory phrases,subject lines, headings, or explanations.
+
+**REFINED EMAIL:**`;
+
+    const req = {
+        model: model,
+        contents: [
+            { role: 'user', parts: [{ text: userPrompt }] }
+        ],
+        generationConfig,
+    };
+
+    try {
+        const result = await ai.models.generateContent(req);
+        console.log('Refined Email Content:', result.text);
+        return result.text;
+    } catch (error) {
+        console.error("Error refining email grammar from AI:", error);
         throw error;
     }
 }

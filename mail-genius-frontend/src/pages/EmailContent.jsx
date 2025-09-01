@@ -25,6 +25,8 @@ import { ResponsiveModal } from '@/components/ResponsiveModal';
 import SummaryContent from '@/components/SummaryContent';
 import { useAuth } from '../auth/AuthProvider'; // Import useAuth
 import { getEmailDetails, parseEmailContent } from '../services/gmail-services'; // Import Gmail services
+import { generateReply, refineEmailGrammar } from '@/services/genai-services';
+import { htmlToPlainText } from '@/utils/email-parser';
 
 const EmailContent = () => {
   const { emails, setEmails, selectedEmail } = useContext(EmailInboxContext);
@@ -47,6 +49,7 @@ const EmailContent = () => {
       try {
         const details = await getEmailDetails(accessToken, selectedEmail.id, 'full');
         const parsedDetails = parseEmailContent(details);
+        // console.log("Parsed Email Details:", parsedDetails);
         setFullEmailDetails(parsedDetails);
       } catch (err) {
         console.error("Failed to fetch full email details:", err);
@@ -105,21 +108,23 @@ const EmailContent = () => {
     });
   };
 
-  const handleMagicReplyClick = (editor) => {
+  const handleMagicReplyClick = async (editor) => {
     if (!selectedEmail || !fullEmailDetails?.from) return;
-    //TODO: Integrate with an actual AI reply generation API
-    const senderNameMatch = fullEmailDetails.from.match(/^([^<]+)/);
-    const senderName = senderNameMatch ? senderNameMatch[1].trim() : 'there';
-    const aiReply = `AI Reply: Hi ${senderName}, thank you for your email. I will get back to you shortly.`;
+    const bodyText = htmlToPlainText(fullEmailDetails.body);
+    const aiReply = await generateReply(bodyText, { senderName: fullEmailDetails.from, receiverName: fullEmailDetails.to });
+    console.log('AI Reply:', aiReply);
     addContentInEditor(editor, aiReply);
   };
-  
-  const handleRefineClick = (editor) => {
+
+  const handleRefineClick = async (editor) => {
     if (!selectedEmail || !fullEmailDetails?.from) return;
-    //TODO: Integrate with an actual AI grammar refinement API
-    const senderNameMatch = fullEmailDetails.from.match(/^([^<]+)/);
-    const senderName = senderNameMatch ? senderNameMatch[1].trim() : 'there';
-    const aiReply = `AI Refined: Hi ${senderName}`; // Placeholder for refinement
+    let textInEditor = '';
+    editor.getEditorState().read(() => {
+      textInEditor = $getRoot().getTextContent();
+    });
+    console.log('Text in Editor for Refinement:', textInEditor);
+    if (!textInEditor.trim()) return; // Don't refine empty content
+    const aiReply = await refineEmailGrammar(textInEditor, fullEmailDetails.from, fullEmailDetails.to);
     addContentInEditor(editor, aiReply);
   };
 

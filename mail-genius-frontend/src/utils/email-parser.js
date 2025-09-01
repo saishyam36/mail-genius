@@ -11,7 +11,7 @@ function normalizeWhitespace(text) {
 }
 
 // Convert HTML to plain text (remove images, keep links)
-function htmlToPlainText(html) {
+export function htmlToPlainText(html) {
   if (!html) return "";
 
   // Remove script/style/noscript content

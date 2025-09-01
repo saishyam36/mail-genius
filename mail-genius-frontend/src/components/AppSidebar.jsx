@@ -33,11 +33,11 @@ const SIDEBAR = {
             url: "/email/inbox",
             icon: MailIcon,
         },
-        {
-            title: "Templates",
-            url: "/templates",
-            icon: GalleryVerticalEnd,
-        },
+        // {
+        //     title: "Templates",
+        //     url: "/templates",
+        //     icon: GalleryVerticalEnd,
+        // },
         {
             title: "Configuration",
             url: "/configuration",
@@ -55,9 +55,9 @@ export function AppSidebar({ ...props }) {
       <SidebarContent>
         <NavMain items={SIDEBAR.navMain} />
       </SidebarContent>
-      <SidebarFooter>
+      {/* <SidebarFooter>
         <NavUser user={SIDEBAR.user} />
-      </SidebarFooter>
+      </SidebarFooter> */}
     </Sidebar>
   )
 }
