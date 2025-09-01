@@ -27,6 +27,7 @@ import { useAuth } from '../auth/AuthProvider'; // Import useAuth
 import { getEmailDetails, parseEmailContent } from '../services/gmail-services'; // Import Gmail services
 import { generateReply, refineEmailGrammar } from '@/services/genai-services';
 import { htmlToPlainText } from '@/utils/email-parser';
+import EmailContentLoader from '@/components/EmailContentLoader';
 
 const EmailContent = () => {
   const { emails, setEmails, selectedEmail } = useContext(EmailInboxContext);
@@ -36,6 +37,7 @@ const EmailContent = () => {
   const [emailContentLoading, setEmailContentLoading] = useState(false);
   const [emailContentError, setEmailContentError] = useState(null);
   const [fullEmailDetails, setFullEmailDetails] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     const fetchFullEmailDetails = async () => {
@@ -99,6 +101,7 @@ const EmailContent = () => {
   };
 
   const addContentInEditor = (editor, content) => {
+    setIsGenerating(false);
     editor.update(() => {
       const root = $getRoot();
       root.clear();
@@ -110,19 +113,19 @@ const EmailContent = () => {
 
   const handleMagicReplyClick = async (editor) => {
     if (!selectedEmail || !fullEmailDetails?.from) return;
+    setIsGenerating(true);
     const bodyText = htmlToPlainText(fullEmailDetails.body);
     const aiReply = await generateReply(bodyText, { senderName: fullEmailDetails.from, receiverName: fullEmailDetails.to });
-    console.log('AI Reply:', aiReply);
     addContentInEditor(editor, aiReply);
   };
 
   const handleRefineClick = async (editor) => {
     if (!selectedEmail || !fullEmailDetails?.from) return;
+    setIsGenerating(true);
     let textInEditor = '';
     editor.getEditorState().read(() => {
       textInEditor = $getRoot().getTextContent();
     });
-    console.log('Text in Editor for Refinement:', textInEditor);
     if (!textInEditor.trim()) return; // Don't refine empty content
     const aiReply = await refineEmailGrammar(textInEditor, fullEmailDetails.from, fullEmailDetails.to);
     addContentInEditor(editor, aiReply);
@@ -130,7 +133,7 @@ const EmailContent = () => {
 
   if (!selectedEmail) {
     return (
-      <div className="p-8 text-center text-muted-foreground">
+      <div className="flex flex-1 items-center justify-center">
         No message selected
       </div>
     );
@@ -138,19 +141,21 @@ const EmailContent = () => {
 
   if (emailContentLoading) {
     return (
-      <div className="flex items-center justify-center h-full">Loading email content...</div>
+      <div className="absolute inset-0 flex items-center justify-center z-10">
+        <EmailContentLoader />
+      </div>
     );
   }
 
   if (emailContentError) {
     return (
-      <div className="flex items-center justify-center h-full text-red-500">{emailContentError}</div>
+      <div className="flex flex-1 items-center justify-center h-full text-red-500">{emailContentError}</div>
     );
   }
 
   if (!fullEmailDetails) {
     return (
-      <div className="p-8 text-center text-muted-foreground">
+      <div className="flex flex-1 items-center justify-centertext-center text-muted-foreground">
         Failed to load email details.
       </div>
     );
@@ -265,6 +270,7 @@ const EmailContent = () => {
               onMagicReply={handleMagicReplyClick}
               onRefineClick={handleRefineClick}
               initialContent={''}
+              isGenerating={isGenerating}
             />
           )}
         </div>

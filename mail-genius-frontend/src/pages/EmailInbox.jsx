@@ -9,6 +9,7 @@ import EmailContent from "./EmailContent";
 import { EmailInboxContext } from "@/contexts/EmailInboxContext";
 import { useAuth } from '../auth/AuthProvider'; // Import useAuth
 import { listEmails, getEmailDetails, parseEmailContent } from '../services/gmail-services'; // Import Gmail services
+import EmailInboxLoader from '@/components/EmailInboxLoader';
 
 const EmailInbox = () => {
   const { emails, setEmails, setSelectedEmail, selectedEmail } = useContext(EmailInboxContext);
@@ -80,7 +81,11 @@ const EmailInbox = () => {
   }, [emails, searchTerm]);
 
   if (authLoading || inboxLoading) {
-    return <div className="flex items-center justify-center h-full">Loading emails...</div>;
+    return (
+      <div className="flex items-center justify-center h-full">
+        <EmailInboxLoader />
+      </div>
+    );
   }
 
   if (error) {

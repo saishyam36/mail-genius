@@ -27,6 +27,7 @@ import '@/styles/editor.scss';
 import { Button } from './ui/button';
 // Import new icons
 import { Send, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, Sparkles, SpellCheck } from 'lucide-react';
+import { Skeleton } from './ui/skeleton';
 
 // Toolbar Plugin as an arrow function
 const ToolbarPlugin = ({ onMagicReply, onRefineClick }) => {
@@ -186,7 +187,7 @@ const SetInitialContentPlugin = ({ initialContent }) => {
 };
 
 // Main Editor Component
-const RichTextEditor = ({ onSend, onCancel, onMagicReply, onRefineClick, initialContent }) => {
+const RichTextEditor = ({ onSend, onCancel, onMagicReply, onRefineClick, initialContent, isGenerating }) => {
   const [hasContent, setHasContent] = useState(false);
   const initialConfig = {
     namespace: 'MyRichTextEditor',
@@ -207,10 +208,18 @@ const RichTextEditor = ({ onSend, onCancel, onMagicReply, onRefineClick, initial
       <div className="editor-shell">
         <ToolbarPlugin onMagicReply={onMagicReply} onRefineClick={onRefineClick} />
         <div className="editor-container overflow-y-auto max-h-40">
-          <RichTextPlugin
-            contentEditable={<ContentEditable className="editor-input" />}
-            placeholder={<div className="editor-placeholder">Type your reply...</div>}
-          />
+          {isGenerating ? (
+            <div className="p-4">
+              <Skeleton className="h-4 w-full mb-2" />
+              <Skeleton className="h-4 w-full mb-2" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          ) : (
+            <RichTextPlugin
+              contentEditable={<ContentEditable className="editor-input" />}
+              placeholder={<div className="editor-placeholder">Type your reply...</div>}
+            />
+          )}
           <HistoryPlugin />
           {/* Add the ListPlugin */}
           <ListPlugin />
