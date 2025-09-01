@@ -53,13 +53,37 @@ export function htmlToPlainText(html) {
   return normalizeWhitespace(text);
 }
 
-// // Example usage:
-// const html = `
-//   <div>
-//     Hello <b>world</b>!
-//     <img src="image.jpg" alt="test" />
-//     <a href="https://example.com">Visit site</a>
-//   </div>
-// `;
+export function getSummaryLengthByWordCount(emailContent) {
+    const wordCount = emailContent.trim().split(/\s+/).length;
+    
+    if (wordCount <= 100) {
+        return 'Very Short';
+    } else if (wordCount <= 250) {
+        return 'Short';
+    } else if (wordCount <= 500) {
+        return 'Medium';
+    } else if (wordCount <= 1000) {
+        return 'Long';
+    } else {
+        return 'Very Long (7-10 key points)';
+    }
+}
 
-// console.log(htmlToPlainText(html));
+export function cleanHtmlOutput(htmlString) {
+  if (typeof htmlString !== 'string') {
+    return '';
+  }
+
+  // A more robust and direct approach
+  let cleaned = htmlString.trim();
+
+  if (cleaned.startsWith('```html')) {
+    cleaned = cleaned.substring(7); // Remove the '```html' part
+  }
+
+  if (cleaned.endsWith('```')) {
+    cleaned = cleaned.slice(0, -3); // Remove the last '```'
+  }
+
+  return cleaned.trim();
+}

@@ -8,6 +8,7 @@ const EmailInboxProvider = ({ children }) => {
   const [selectedEmail, setSelectedEmail] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [summary, setSummary] = useState('');
 
   const addEmail = useMemo(() => (email) => {
     setEmails((prevEmails) => [...prevEmails, email]);
@@ -33,6 +34,8 @@ const EmailInboxProvider = ({ children }) => {
     loading,
     setLoading,
     error,
+    summary,
+    setSummary,
     setError,
     addEmail,
     updateEmail,
@@ -41,6 +44,7 @@ const EmailInboxProvider = ({ children }) => {
     addEmail,
     updateEmail,
     deleteEmail,
+    summary
   ]);
 
   return (

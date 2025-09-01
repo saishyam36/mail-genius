@@ -302,3 +302,112 @@ ${emailContent}
         throw error;
     }
 }
+
+export async function summarizeEmail(emailContent, summaryOptions = {}) {
+    const systemInstructions = {
+        text: `You are an expert email summarization assistant designed to create concise, accurate summaries of email content. Your goal is to extract and present the most important information in a clear, structured format.
+
+CORE PRINCIPLES:
+- Identify and extract key information, action items, and main points
+- Create concise summaries that capture essential details
+- Maintain accuracy and preserve important context
+- Structure summaries for easy scanning and understanding
+- Highlight actionable items and deadlines clearly
+- Preserve important names, dates, numbers, and specific details
+
+SUMMARY GUIDELINES:
+- Start with the main purpose/topic of the email
+- List key points in order of importance
+- Identify specific action items and their owners
+- Note important deadlines, dates, and timelines
+- Mention key stakeholders and participants
+- Include relevant numbers, metrics, or data points
+- Flag urgent or time-sensitive items
+
+OUTPUT REQUIREMENTS:
+- Keep summaries concise but comprehensive
+- Use bullet points for clarity
+- Highlight urgent items appropriately
+- Ensure no critical information is lost
+- Make summaries actionable and useful for quick decision-making
+- Format the summary in HTML using semantic tags such as <ul>, <li>, <strong>, and <em> where appropriate.`
+    };
+
+    const generationConfig = {
+        maxOutputTokens: 10000,
+        topP: 0.3,
+        safetySettings: [
+            {
+                category: 'HARM_CATEGORY_HATE_SPEECH',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+            },
+            {
+                category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+            },
+            {
+                category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+                threshold: 'BLOCK_LOW_AND_ABOVE',
+            },
+            {
+                category: 'HARM_CATEGORY_HARASSMENT',
+                threshold: 'BLOCK_LOW_AND_ABOVE',
+            }
+        ],
+        responseMimeType: "text/html",
+        systemInstruction: {
+            parts: [systemInstructions]
+        },
+        temperature: 0.2, // Low temperature for consistent, accurate summaries
+    };
+
+    // Add these parameters later for more customization in application
+    //     **SUMMARY REQUIREMENTS:**
+    // - Summary Length: ${summaryOptions.length || 'Medium (3-5 key points)'}
+    // - Focus Area: ${summaryOptions.focusArea || 'All important aspects'}
+    // - Include Action Items: ${summaryOptions.includeActionItems !== false ? 'Yes' : 'No'}
+    // - Highlight Urgency: ${summaryOptions.highlightUrgency !== false ? 'Yes' : 'No'}
+    // - Target Audience: ${summaryOptions.targetAudience || 'General business audience'}
+
+    const userPrompt = `Summarize the following email content according to the specified requirements:
+
+**EMAIL TO SUMMARIZE:**
+${emailContent}
+
+**SUMMARY REQUIREMENTS:**
+- Summary Length: ${summaryOptions.length}
+
+SUMMARY STRUCTURE:
+- Main Topic: Brief description of email's primary purpose
+- Key Points: Most important information (3-5 bullet points max)
+- Action Items: Specific tasks with owners and deadlines
+- Important Details: Dates, numbers, names, or other critical data
+- Urgency Level: Assessment of time-sensitivity
+
+**INSTRUCTIONS:**
+1. Read the email carefully and identify the main purpose and key information
+2. Extract the most important points, action items, and deadlines
+3. Create a structured summary using HTML semantic tags (<ul>, <li>, <strong>, <em>) for clarity and hierarchy
+4. Use proper indentation and line breaks for readability
+5. Preserve all critical details like names, dates, numbers, and specific requirements
+6. Organize information in order of importance and urgency
+7. Format lists and instructions clearly with consistent indentation and spacing
+
+**SUMMARY:**`;
+
+    const req = {
+        model: model,
+        contents: [
+            { role: 'user', parts: [{ text: userPrompt }] }
+        ],
+        generationConfig,
+    };
+
+    try {
+        const result = await ai.models.generateContent(req);
+        return result.text;
+    } catch (error) {
+        console.error("Error summarizing email from AI:", error);
+        throw error;
+    }
+}

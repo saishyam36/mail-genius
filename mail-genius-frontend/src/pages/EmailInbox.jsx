@@ -12,7 +12,7 @@ import { listEmails, getEmailDetails, parseEmailContent } from '../services/gmai
 import EmailInboxLoader from '@/components/EmailInboxLoader';
 
 const EmailInbox = () => {
-  const { emails, setEmails, setSelectedEmail, selectedEmail } = useContext(EmailInboxContext);
+  const { emails, setEmails, setSelectedEmail, selectedEmail,setSummary } = useContext(EmailInboxContext);
   const { accessToken, loading: authLoading } = useAuth(); // Get accessToken and authLoading from AuthContext
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -67,6 +67,7 @@ const EmailInbox = () => {
         emails.map((e) => (e.id === email.id ? { ...e, read: true } : e))
       );
     }
+    setSummary('');
     setSelectedEmail(email);
   };
 

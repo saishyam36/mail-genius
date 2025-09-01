@@ -20,8 +20,6 @@ import {
   KEY_DOWN_COMMAND,
   COMMAND_PRIORITY_LOW,
   $getRoot,
-  $createParagraphNode,
-  $createTextNode,
 } from 'lexical';
 import '@/styles/editor.scss';
 import { Button } from './ui/button';
@@ -48,7 +46,12 @@ const ToolbarPlugin = ({ onMagicReply, onRefineClick }) => {
       // List formatting
       const anchorNode = selection.anchor.getNode();
       const parent = anchorNode.getParent();
-      const listNode = $isListNode(parent) ? parent : ($isListNode(anchorNode) ? anchorNode : null);
+      let listNode = null;
+      if ($isListNode(parent)) {
+        listNode = parent;
+      } else if ($isListNode(anchorNode)) {
+        listNode = anchorNode;
+      }
 
       if (listNode) {
         setIsUl(listNode.getTag() === 'ul');
@@ -167,27 +170,9 @@ const ActionsPlugin = ({ onSend, onCancel, hasContent }) => {
   );
 };
 
-// Plugin to set initial content
-const SetInitialContentPlugin = ({ initialContent }) => {
-  const [editor] = useLexicalComposerContext();
-
-  useEffect(() => {
-    if (initialContent) {
-      editor.update(() => {
-        const root = $getRoot();
-        root.clear();
-        const paragraph = $createParagraphNode();
-        paragraph.append($createTextNode(initialContent));
-        root.append(paragraph);
-      });
-    }
-  }, [editor, initialContent]);
-
-  return null;
-};
 
 // Main Editor Component
-const RichTextEditor = ({ onSend, onCancel, onMagicReply, onRefineClick, initialContent, isGenerating }) => {
+const RichTextEditor = ({ onSend, onCancel, onMagicReply, onRefineClick, isGenerating }) => {
   const [hasContent, setHasContent] = useState(false);
   const initialConfig = {
     namespace: 'MyRichTextEditor',
@@ -231,7 +216,6 @@ const RichTextEditor = ({ onSend, onCancel, onMagicReply, onRefineClick, initial
             });
           }} />
           <SendWithKeybindPlugin onSend={handleSend} />
-          <SetInitialContentPlugin initialContent={initialContent} />
         </div>
         <ActionsPlugin onSend={handleSend} onCancel={onCancel} hasContent={hasContent} />
       </div>

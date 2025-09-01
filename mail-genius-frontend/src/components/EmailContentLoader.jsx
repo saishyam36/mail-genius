@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/email-content-loader.css';
+import '../styles/email-content-loader.scss';
 
 const EmailContentLoader = () => {
   return (

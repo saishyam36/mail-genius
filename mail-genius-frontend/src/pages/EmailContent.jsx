@@ -25,19 +25,19 @@ import { ResponsiveModal } from '@/components/ResponsiveModal';
 import SummaryContent from '@/components/SummaryContent';
 import { useAuth } from '../auth/AuthProvider'; // Import useAuth
 import { getEmailDetails, parseEmailContent } from '../services/gmail-services'; // Import Gmail services
-import { generateReply, refineEmailGrammar } from '@/services/genai-services';
-import { htmlToPlainText } from '@/utils/email-parser';
+import { generateReply, refineEmailGrammar, summarizeEmail } from '@/services/genai-services';
+import { cleanHtmlOutput, getSummaryLengthByWordCount, htmlToPlainText } from '@/utils/helper';
 import EmailContentLoader from '@/components/EmailContentLoader';
 
 const EmailContent = () => {
-  const { emails, setEmails, selectedEmail } = useContext(EmailInboxContext);
+  const { emails, setEmails, selectedEmail,summary,setSummary } = useContext(EmailInboxContext);
   const { accessToken } = useAuth(); // Get accessToken
   const [showReplyEditor, setShowReplyEditor] = useState(false);
-  const [summary, setSummary] = useState("");
   const [emailContentLoading, setEmailContentLoading] = useState(false);
   const [emailContentError, setEmailContentError] = useState(null);
   const [fullEmailDetails, setFullEmailDetails] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSummarizing, setIsSummarizing] = useState(false); // New state for summary loading
 
   useEffect(() => {
     const fetchFullEmailDetails = async () => {
@@ -69,10 +69,22 @@ const EmailContent = () => {
     setShowReplyEditor(true);
   };
 
-  const handleSummarizeClick = () => {
+  const handleSummarizeClick = async() => {
     if (!selectedEmail || !fullEmailDetails?.body) return;
-    //TODO: Integrate with an actual AI summary API
-    setSummary(`Summary of: "${fullEmailDetails.subject || 'No Subject'}"\n\n${fullEmailDetails.body.substring(0, 200)}... (This is a simulated summary)`);
+    if(summary) return; // If summary already exists, do nothing
+    setIsSummarizing(true); // Set loading to true
+    try {
+      const bodyText = htmlToPlainText(fullEmailDetails.body);
+      const summaryLength = getSummaryLengthByWordCount(bodyText)
+      const aiSummary = await summarizeEmail(bodyText, {length: summaryLength});
+      const formattedSummary = cleanHtmlOutput(aiSummary);
+      setSummary(formattedSummary);
+    } catch (error) {
+      console.error("Error summarizing email:", error);
+      setSummary("Failed to generate summary."); // Display an error message
+    } finally {
+      setIsSummarizing(false); // Set loading to false
+    }
   };
 
   const handleSendReply = (editor) => {
@@ -187,13 +199,14 @@ const EmailContent = () => {
             <ResponsiveModal
               responsive={true}
               title="Summary"
+              className="max-w-lg"
               description="Get a quick summary of this email!!!"
               trigger={<Button size="sm" variant='secondary' onClick={handleSummarizeClick} className="ml-auto rounded hover:bg-primary-foreground">
                 <BookOpenText /> <span className="bg-gradient-to-b from-gray-900 via-slate-800 to-neutral-500 bg-clip-text text-transparent">Summarize</span>
-              </Button>}
-            >
-              <SummaryContent summary={summary} />
-            </ResponsiveModal>
+            </Button>}
+          >
+            <SummaryContent summary={summary} isSummarizing={isSummarizing} />
+          </ResponsiveModal>
 
             {/* <Button variant="ghost" size="icon">
               <ReplyAll className="h-4 w-4" />
@@ -269,7 +282,6 @@ const EmailContent = () => {
               onCancel={handleCancelReply}
               onMagicReply={handleMagicReplyClick}
               onRefineClick={handleRefineClick}
-              initialContent={''}
               isGenerating={isGenerating}
             />
           )}
