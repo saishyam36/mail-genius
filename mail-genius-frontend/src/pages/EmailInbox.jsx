@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState, useMemo, useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -8,14 +8,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import EmailContent from "./EmailContent";
 import { EmailInboxContext } from "@/contexts/EmailInboxContext";
 import { useAuth } from '../auth/AuthProvider'; // Import useAuth
-import { listEmails, getEmailDetails, parseEmailContent } from '../services/gmail-services'; // Import Gmail services
+import { listEmails, getEmailDetails, searchEmails,  } from '../services/gmail-services'; // Import Gmail services
 import EmailInboxLoader from '@/components/EmailInboxLoader';
+import { parseEmailContent } from "@/utils/helper";
+import useDebounce from "@/hooks/use-debounce";
 
 const EmailInbox = () => {
-  const { emails, setEmails, setSelectedEmail, selectedEmail,setSummary } = useContext(EmailInboxContext);
+  const { emails, setEmails, setSelectedEmail, selectedEmail, setSummary } = useContext(EmailInboxContext);
   const { accessToken, loading: authLoading } = useAuth(); // Get accessToken and authLoading from AuthContext
 
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [inboxLoading, setInboxLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -25,19 +28,31 @@ const EmailInbox = () => {
         setInboxLoading(false);
         return;
       }
-
-      setInboxLoading(true);
       setError(null);
       try {
-        const messagesResponse = await listEmails(accessToken);
-        const messageIds = messagesResponse.map(msg => msg.id);
+        let detailedEmails = [];
+        if (debouncedSearchTerm) {
+          const messagesResponse = await searchEmails(accessToken, debouncedSearchTerm);
+          const messageIds = messagesResponse.map(msg => msg.id);
 
-        const detailedEmailsPromises = messageIds.map(async (messageId) => {
-          const details = await getEmailDetails(accessToken, messageId);
-          return parseEmailContent(details);
-        });
+          const detailedEmailsPromises = messageIds.map(async (messageId) => {
+            const details = await getEmailDetails(accessToken, messageId);
+            return parseEmailContent(details);
+          });
 
-        const detailedEmails = await Promise.all(detailedEmailsPromises);
+          detailedEmails = await Promise.all(detailedEmailsPromises);
+        } else {
+          setInboxLoading(true);
+          const messagesResponse = await listEmails(accessToken, 'in:inbox');
+          const messageIds = messagesResponse.map(msg => msg.id);
+
+          const detailedEmailsPromises = messageIds.map(async (messageId) => {
+            const details = await getEmailDetails(accessToken, messageId);
+            return parseEmailContent(details);
+          });
+
+          detailedEmails = await Promise.all(detailedEmailsPromises);
+        }
         setEmails(detailedEmails);
         if (detailedEmails.length > 0 && !selectedEmail) {
           setSelectedEmail(detailedEmails[0]);
@@ -51,7 +66,7 @@ const EmailInbox = () => {
     };
 
     fetchAndSetEmails();
-  }, [accessToken, authLoading, setEmails, setSelectedEmail]); // Re-run when accessToken or authLoading changes
+  }, [accessToken, authLoading, debouncedSearchTerm]); // Re-run when accessToken or authLoading changes
 
   // Effect to handle initial load or invalid ID
   useEffect(() => {
@@ -70,16 +85,6 @@ const EmailInbox = () => {
     setSummary('');
     setSelectedEmail(email);
   };
-
-  const filteredEmails = useMemo(() => {
-    if (!searchTerm) return emails;
-    return emails.filter(
-      (email) =>
-        (email?.from.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (email?.subject.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (email?.body.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-  }, [emails, searchTerm]);
 
   if (authLoading || inboxLoading) {
     return (
@@ -134,7 +139,7 @@ const EmailInbox = () => {
           </div>
           <TabsContent value="all" className="m-0 flex-1 overflow-y-auto">
             <div className="flex flex-col gap-2 p-4 pt-0">
-              {filteredEmails.map((item) => (
+              {emails.map((item) => (
                 <button
                   key={item.id}
                   className={cn(
@@ -167,14 +172,14 @@ const EmailInbox = () => {
                   </div>
                 </button>
               ))}
-              {filteredEmails.length === 0 && <p className="p-4 text-center text-muted-foreground">No emails found.</p>}
+              {emails.length === 0 && <p className="p-4 text-center text-muted-foreground">No emails found.</p>}
             </div>
           </TabsContent>
           <TabsContent value="unread" className="m-0 flex-1 overflow-y-auto">
             <div className="flex flex-col gap-2 p-4 pt-0">
               {/* For unread, you'd need to filter based on Gmail labels.
                   For simplicity, we'll show all emails here for now. */}
-              {filteredEmails.map((item) => (
+              {emails.map((item) => (
                 <button
                   key={item.id}
                   className={cn(
@@ -210,7 +215,7 @@ const EmailInbox = () => {
                   </div>
                 </button>
               ))}
-              {filteredEmails.length === 0 && <p className="p-4 text-center text-muted-foreground">No emails found.</p>}
+              {emails.length === 0 && <p className="p-4 text-center text-muted-foreground">No emails found.</p>}
             </div>
           </TabsContent>
         </Tabs>

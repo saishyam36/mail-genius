@@ -87,3 +87,52 @@ export function cleanHtmlOutput(htmlString) {
 
   return cleaned.trim();
 }
+
+// Helper function to decode base64url string
+export const decodeBase64Url = (input) => {
+  return decodeURIComponent(atob(input.replace(/-/g, '+').replace(/_/g, '/')).split('').map(function(c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+};
+
+export const parseEmailContent = (message) => {
+  const emailPayload = message.payload;
+  let body = '';
+  const headers = {};
+
+  emailPayload.headers.forEach(header => {
+     headers[header.name] = header.value;
+  });
+
+  const getParts = (parts) => {
+    parts.forEach(part => {
+      if (part.mimeType === 'text/plain' && part.body?.data) {
+        body += decodeBase64Url(part.body.data);
+      } else if (part.mimeType === 'text/html' && part.body?.data) {
+        // Prioritize HTML if available, but for simplicity, we'll just append for now.
+        // In a real app, you'd choose one or the other or render HTML safely.
+        body += decodeBase64Url(part.body.data);
+      } else if (part.parts) {
+        getParts(part.parts);
+      }
+    });
+  };
+
+  if (emailPayload.parts) {
+    getParts(emailPayload.parts);
+  } else if (emailPayload.body?.data) {
+    body = decodeBase64Url(emailPayload.body.data);
+  }
+
+  return {
+    id: message.id,
+    messageId: headers['Message-ID'],
+    threadId: message.threadId,
+    subject: headers['Subject'],
+    from: headers['From'],
+    to: headers['To'],
+    date: headers['Date'],
+    body: body,
+    headers: headers,
+  };
+};

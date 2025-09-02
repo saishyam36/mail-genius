@@ -24,9 +24,9 @@ import "@/styles/site-header.scss";
 import { ResponsiveModal } from '@/components/ResponsiveModal';
 import SummaryContent from '@/components/SummaryContent';
 import { useAuth } from '../auth/AuthProvider'; // Import useAuth
-import { getEmailDetails, parseEmailContent } from '../services/gmail-services'; // Import Gmail services
+import { getEmailDetails } from '../services/gmail-services'; // Import Gmail services
 import { generateReply, refineEmailGrammar, summarizeEmail } from '@/services/genai-services';
-import { cleanHtmlOutput, getSummaryLengthByWordCount, htmlToPlainText } from '@/utils/helper';
+import { cleanHtmlOutput, getSummaryLengthByWordCount, htmlToPlainText, parseEmailContent } from '@/utils/helper';
 import EmailContentLoader from '@/components/EmailContentLoader';
 
 const EmailContent = () => {

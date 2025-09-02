@@ -5,15 +5,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
-  const { login, accessToken, loading } = useAuth();
+  const { login, accessToken, loading, isTokenExpired } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!loading && accessToken) {
-      // If already logged in, redirect to inbox
-      navigate('/email/inbox');
+      if (isTokenExpired(accessToken)) {
+        // If token is expired, redirect to login
+        console.log('Token expired. Redirecting to login.');
+        navigate('/login');
+      } else {
+        // If already logged in and token is valid, redirect to inbox
+        navigate('/email/inbox');
+      }
     }
-  }, [accessToken, loading, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accessToken, loading]);
 
   if (loading) {
     return <div>Loading authentication status...</div>;

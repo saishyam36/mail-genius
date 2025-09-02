@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const GMAIL_API_BASE_URL = 'https://www.googleapis.com/gmail/v1/users/me';
 
-export const listEmails = async (accessToken, query = 'in:inbox', maxResults = 10) => {
+export const listEmails = async (accessToken, query = 'in:inbox', maxResults = 100) => {
   if (!accessToken) {
     throw new Error('Access token is required to list emails.');
   }
@@ -21,6 +21,11 @@ export const listEmails = async (accessToken, query = 'in:inbox', maxResults = 1
     console.error('Error listing emails:', error.response ? error.response.data : error.message);
     throw error;
   }
+};
+
+export const searchEmails = async (accessToken, searchTerm) => {
+  const query = `${searchTerm}`;
+  return listEmails(accessToken, query);
 };
 
 export const getEmailDetails = async (accessToken, messageId, format = 'full') => {
@@ -44,53 +49,4 @@ export const getEmailDetails = async (accessToken, messageId, format = 'full') =
     console.error(`Error fetching email details for ${messageId}:`, error.response ? error.response.data : error.message);
     throw error;
   }
-};
-
-// Helper function to decode base64url string
-const decodeBase64Url = (input) => {
-  return decodeURIComponent(atob(input.replace(/-/g, '+').replace(/_/g, '/')).split('').map(function(c) {
-    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-  }).join(''));
-};
-
-export const parseEmailContent = (message) => {
-  const emailPayload = message.payload;
-  let body = '';
-  const headers = {};
-
-  emailPayload.headers.forEach(header => {
-     headers[header.name] = header.value;
-  });
-
-  const getParts = (parts) => {
-    parts.forEach(part => {
-      if (part.mimeType === 'text/plain' && part.body?.data) {
-        body += decodeBase64Url(part.body.data);
-      } else if (part.mimeType === 'text/html' && part.body?.data) {
-        // Prioritize HTML if available, but for simplicity, we'll just append for now.
-        // In a real app, you'd choose one or the other or render HTML safely.
-        body += decodeBase64Url(part.body.data);
-      } else if (part.parts) {
-        getParts(part.parts);
-      }
-    });
-  };
-
-  if (emailPayload.parts) {
-    getParts(emailPayload.parts);
-  } else if (emailPayload.body?.data) {
-    body = decodeBase64Url(emailPayload.body.data);
-  }
-
-  return {
-    id: message.id,
-    messageId: headers['Message-ID'],
-    threadId: message.threadId,
-    subject: headers['Subject'],
-    from: headers['From'],
-    to: headers['To'],
-    date: headers['Date'],
-    body: body,
-    headers: headers,
-  };
 };

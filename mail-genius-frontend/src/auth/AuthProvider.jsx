@@ -18,6 +18,26 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const isTokenExpired = React.useCallback((token) => {
+    if (!token) return true;
+
+    // Check if the token exists in localStorage
+    const storedToken = localStorage.getItem('google_access_token');
+    if (!storedToken) return true;
+
+    // Get the expiration time from localStorage
+    const storedExpiration = localStorage.getItem('google_access_token_expiration');
+
+    if (!storedExpiration) return false; // Assume not expired if no expiration time
+
+    const expirationDate = new Date(parseInt(storedExpiration));
+    const now = new Date();
+
+    console.log('Token expiration check:', { expirationDate, now, isExpired: expirationDate <= now });
+
+    return expirationDate <= now;
+  }, []);
+
   const logout = React.useCallback(() => {
     setAccessToken(null);
     setUser(null);
@@ -30,6 +50,11 @@ export const AuthProvider = ({ children }) => {
   const setAccessTokenWithExpiration = (token, expiresIn) => {
     setAccessToken(token);
     localStorage.setItem('google_access_token', token);
+
+    // Store the expiration time in localStorage
+    const expirationTime = new Date().getTime() + expiresIn * 1000;
+    localStorage.setItem('google_access_token_expiration', expirationTime.toString());
+
     clearAccessTokenTimer(); // Clear any existing timer
 
     // Set a new timer to remove the token when it expires
@@ -87,8 +112,8 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const contextValue = React.useMemo(
-    () => ({ accessToken, user, login, logout, loading }),
-    [accessToken, user, login, logout, loading]
+    () => ({ accessToken, user, login, logout, loading, isTokenExpired }),
+    [accessToken, user, login, logout, loading, isTokenExpired]
   );
 
   return (
