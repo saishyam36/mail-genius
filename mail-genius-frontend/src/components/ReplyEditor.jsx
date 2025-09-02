@@ -154,7 +154,7 @@ const SendWithKeybindPlugin = ({ onSend }) => {
 const ActionsPlugin = ({ onSend, onCancel, hasContent }) => {
   const [editor] = useLexicalComposerContext();
   const handleSendClick = () => {
-    onSend(editor.getEditorState());
+    onSend(editor);
   };
   return (
     <div className="editor-footer">
@@ -179,13 +179,6 @@ const RichTextEditor = ({ onSend, onCancel, onMagicReply, onRefineClick, isGener
     onError: (error) => { throw error; },
     // Register the list nodes
     nodes: [ListNode, ListItemNode],
-  };
-
-  const handleSend = (editorState) => {
-    if (hasContent) {
-      console.log("Sending content...");
-      onSend(editorState);
-    }
   };
 
   return (
@@ -215,9 +208,9 @@ const RichTextEditor = ({ onSend, onCancel, onMagicReply, onRefineClick, isGener
               setHasContent(textContent.trim() !== '');
             });
           }} />
-          <SendWithKeybindPlugin onSend={handleSend} />
+          <SendWithKeybindPlugin onSend={onSend} />
         </div>
-        <ActionsPlugin onSend={handleSend} onCancel={onCancel} hasContent={hasContent} />
+        <ActionsPlugin onSend={onSend} onCancel={onCancel} hasContent={hasContent} />
       </div>
     </LexicalComposer>
   );

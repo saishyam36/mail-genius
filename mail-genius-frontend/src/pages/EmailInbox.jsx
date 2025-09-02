@@ -66,7 +66,7 @@ const EmailInbox = () => {
     };
 
     fetchAndSetEmails();
-  }, [accessToken, authLoading, debouncedSearchTerm]); // Re-run when accessToken or authLoading changes
+  }, [accessToken, debouncedSearchTerm]); // Re-run when accessToken or authLoading changes
 
   // Effect to handle initial load or invalid ID
   useEffect(() => {

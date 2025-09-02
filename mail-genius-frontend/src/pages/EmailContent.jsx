@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,59 +24,70 @@ import "@/styles/site-header.scss";
 import { ResponsiveModal } from '@/components/ResponsiveModal';
 import SummaryContent from '@/components/SummaryContent';
 import { useAuth } from '../auth/AuthProvider'; // Import useAuth
-import { getEmailDetails } from '../services/gmail-services'; // Import Gmail services
+import { getEmailsInThread, sendReply } from '../services/gmail-services'; // Import Gmail services
 import { generateReply, refineEmailGrammar, summarizeEmail } from '@/services/genai-services';
-import { cleanHtmlOutput, getSummaryLengthByWordCount, htmlToPlainText, parseEmailContent } from '@/utils/helper';
+import { cleanHtmlOutput, getSummaryLengthByWordCount, htmlToPlainText } from '@/utils/helper';
 import EmailContentLoader from '@/components/EmailContentLoader';
 
 const EmailContent = () => {
-  const { emails, setEmails, selectedEmail,summary,setSummary } = useContext(EmailInboxContext);
+  const { emails, setEmails, selectedEmail, summary, setSummary } = useContext(EmailInboxContext);
   const { accessToken } = useAuth(); // Get accessToken
   const [showReplyEditor, setShowReplyEditor] = useState(false);
   const [emailContentLoading, setEmailContentLoading] = useState(false);
   const [emailContentError, setEmailContentError] = useState(null);
   const [fullEmailDetails, setFullEmailDetails] = useState(null);
+  const [emailConversation, setEmailConversation] = useState([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSummarizing, setIsSummarizing] = useState(false); // New state for summary loading
+  const emailContentRef = useRef(null);
 
-  useEffect(() => {
-    const fetchFullEmailDetails = async () => {
+   const fetchFullEmailDetails = useCallback(async () => {
       if (!selectedEmail || !accessToken) {
         setFullEmailDetails(null);
         return;
       }
-
       setEmailContentLoading(true);
       setEmailContentError(null);
       try {
-        const details = await getEmailDetails(accessToken, selectedEmail.id, 'full');
-        const parsedDetails = parseEmailContent(details);
-        // console.log("Parsed Email Details:", parsedDetails);
-        setFullEmailDetails(parsedDetails);
+        const details = await getEmailsInThread(accessToken, selectedEmail.threadId);
+        setFullEmailDetails(details[0]);
+        setEmailConversation(details);
       } catch (err) {
-        console.error("Failed to fetch full email details:", err);
+        console.log("Failed to fetch full email details:", err);
         setEmailContentError("Failed to load email content.");
         setFullEmailDetails(null);
       } finally {
         setEmailContentLoading(false);
       }
-    };
+    }
+    , [selectedEmail, accessToken]);
 
+
+  useEffect(() => {
     fetchFullEmailDetails();
-  }, [selectedEmail, accessToken]); // Re-fetch when selectedEmail or accessToken changes
+  }, [fetchFullEmailDetails]); // Re-fetch when selectedEmail or accessToken changes
+
+  useEffect(() => {
+    if (showReplyEditor && emailContentRef.current) {
+       emailContentRef.current.scrollTo({
+        top: emailContentRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [showReplyEditor]);
 
   const handleReplyClick = () => {
     setShowReplyEditor(true);
   };
 
-  const handleSummarizeClick = async() => {
+  const handleSummarizeClick = async () => {
     if (!selectedEmail || !fullEmailDetails?.body) return;
-    if(summary) return; // If summary already exists, do nothing
+    if (summary) return; // If summary already exists, do nothing
     setIsSummarizing(true); // Set loading to true
     try {
       const bodyText = htmlToPlainText(fullEmailDetails.body);
       const summaryLength = getSummaryLengthByWordCount(bodyText)
-      const aiSummary = await summarizeEmail(bodyText, {length: summaryLength});
+      const aiSummary = await summarizeEmail(bodyText, { length: summaryLength });
       const formattedSummary = cleanHtmlOutput(aiSummary);
       setSummary(formattedSummary);
     } catch (error) {
@@ -87,24 +98,20 @@ const EmailContent = () => {
     }
   };
 
-  const handleSendReply = (editor) => {
-    const editorState = editor.getEditorState();
-    const contentJSON = JSON.stringify(editorState);
-    console.log('Reply content:', contentJSON);
-
-    // You can also get plain text for notifications or previews
+  const handleSendReply = async (editorState) => {
+    let textInEditor = '';
     editorState.read(() => {
-      const root = $getRoot();
-      const text = root.getTextContent();
-      alert(`Reply Sent!\n\nContent:\n${text.substring(0, 80)}...`);
+      textInEditor = $getRoot().getTextContent();
     });
-
-    // After sending, you can clear the editor.
-    editor.update(() => {
-      $getRoot().clear();
-    });
-
-    setShowReplyEditor(false);
+    try {
+      await sendReply(accessToken, selectedEmail.messageId, selectedEmail.from, selectedEmail.subject, textInEditor, selectedEmail.threadId);
+      setShowReplyEditor(false);
+      setTimeout(async () => {
+      await fetchFullEmailDetails();
+      }, 2000); // Delay to allow Gmail to process the new email
+    } catch (error) {
+      console.error("Error sending reply:", error);
+    }
   };
 
   const handleCancelReply = () => {
@@ -153,7 +160,7 @@ const EmailContent = () => {
 
   if (emailContentLoading) {
     return (
-      <div className="absolute inset-0 flex items-center justify-center z-10">
+      <div className="flex flex-1 items-center justify-center">
         <EmailContentLoader />
       </div>
     );
@@ -173,9 +180,9 @@ const EmailContent = () => {
     );
   }
 
-  const senderName = fullEmailDetails.from ? fullEmailDetails.from.match(/^([^<]+)/)?.[1]?.trim() || fullEmailDetails.from : 'Unknown Sender';
-  const senderEmail = fullEmailDetails.from ? fullEmailDetails.from.match(/<([^>]+)>/)?.[1] || fullEmailDetails.from : 'unknown@example.com';
-  const initials = senderName.split(" ").map((chunk) => chunk[0]).join("");
+  const parseName = (emailString) => emailString ? emailString.match(/^([^<]+)/)?.[1]?.trim() || emailString : 'Unknown Sender';
+  const parseEmailAddress = (emailString) => emailString ? emailString.match(/<([^>]+)>/)?.[1] || emailString : 'unknown@example.com';
+  const getInitials = (name) => name.split(" ").map((chunk) => chunk[0]).join("");
 
   return (
     <div className="flex-1">
@@ -203,10 +210,10 @@ const EmailContent = () => {
               description="Get a quick summary of this email!!!"
               trigger={<Button size="sm" variant='secondary' onClick={handleSummarizeClick} className="ml-auto rounded hover:bg-primary-foreground">
                 <BookOpenText /> <span className="bg-gradient-to-b from-gray-900 via-slate-800 to-neutral-500 bg-clip-text text-transparent">Summarize</span>
-            </Button>}
-          >
-            <SummaryContent summary={summary} isSummarizing={isSummarizing} />
-          </ResponsiveModal>
+              </Button>}
+            >
+              <SummaryContent summary={summary} isSummarizing={isSummarizing} />
+            </ResponsiveModal>
 
             {/* <Button variant="ghost" size="icon">
               <ReplyAll className="h-4 w-4" />
@@ -245,49 +252,61 @@ const EmailContent = () => {
           </DropdownMenu>
         </div>
         <Separator />
-        <div className="flex flex-1 flex-col overflow-y-auto">
-          <div className="flex items-start p-4">
-            <div className="flex items-start gap-4 text-sm">
-              <Avatar>
-                <AvatarImage alt={senderName} />
-                <AvatarFallback>
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="grid gap-1">
-                <div className="font-semibold">{senderName}</div>
-                <div className="line-clamp-1 text-xs">
-                  {fullEmailDetails.subject || '(No Subject)'}
+        <div ref={emailContentRef} className="flex flex-1 flex-col overflow-y-auto">
+          {/* Render the entire email conversation */}
+          {emailConversation?.map((email, index) => (
+              <div key={email.id} className={`flex flex-col border-b ${index === 0 ? '' : 'mt-4'}`}>
+                <div className="flex items-start p-4">
+                  <div className="flex items-start gap-4 text-sm">
+                    <Avatar>
+                      <AvatarImage alt={parseName(email.from)} />
+                      <AvatarFallback>{getInitials(parseName(email.from))}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="grid gap-1">
+                      <div className="font-semibold">{parseName(email.from)}</div>
+                      <div className="line-clamp-1 text-xs">
+                        {email.subject || '(No Subject)'}
+                      </div>
+                      <div className="line-clamp-1 text-xs">
+                        <span className="font-medium">From:</span>{" "}
+                        {parseEmailAddress(email.from)}{" "}
+                      </div>
+                    </div>
+                  </div>
+                  {email.date && (
+                    <div className="ml-auto text-xs text-muted-foreground">
+                      {new Intl.DateTimeFormat('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true,
+                      }).format(new Date(email.date))}
+                    </div>
+                  )}
                 </div>
-                <div className="line-clamp-1 text-xs">
-                  <span className="font-medium">From:</span>{" "}
-                  {senderEmail}
-                </div>
+                <Separator />
+                <div
+                  className="flex-1 p-4 text-sm overflow-y-auto max-w-full break-words"
+                  dangerouslySetInnerHTML={{ __html: email.body }}
+                />
+                <Separator />
               </div>
-            </div>
-            {fullEmailDetails.date && (
-              <div className="ml-auto text-xs text-muted-foreground">
-                {new Date(fullEmailDetails.date).toLocaleString()}
-              </div>
+            ))}
+            {showReplyEditor && (
+              <RichTextEditor
+                onSend={(editorState) => handleSendReply(editorState)}
+                onCancel={handleCancelReply}
+                onMagicReply={handleMagicReplyClick}
+                onRefineClick={handleRefineClick}
+                isGenerating={isGenerating}
+              />
             )}
           </div>
-          <Separator />
-          <div
-            className="flex-1 p-4 text-sm overflow-y-auto max-w-full break-words"
-            dangerouslySetInnerHTML={{ __html: fullEmailDetails.body }}
-          />
-          {showReplyEditor && (
-            <RichTextEditor
-              onSend={handleSendReply}
-              onCancel={handleCancelReply}
-              onMagicReply={handleMagicReplyClick}
-              onRefineClick={handleRefineClick}
-              isGenerating={isGenerating}
-            />
-          )}
         </div>
       </div>
-    </div>
   );
 };
 

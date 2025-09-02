@@ -5,17 +5,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
-  const { login, accessToken, loading, isTokenExpired } = useAuth();
+  const { login, accessToken, loading, isTokenExpired, logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!loading && accessToken) {
-      if (isTokenExpired(accessToken)) {
-        // If token is expired, redirect to login
+      const isExpired = isTokenExpired(accessToken);
+      if (isExpired) {
         console.log('Token expired. Redirecting to login.');
+        logout();
         navigate('/login');
       } else {
-        // If already logged in and token is valid, redirect to inbox
         navigate('/email/inbox');
       }
     }

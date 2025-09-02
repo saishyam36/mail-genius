@@ -1,13 +1,10 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
-import axios from 'axios';
-
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const accessTokenTimerRef = useRef(null);
 
@@ -21,7 +18,6 @@ export const AuthProvider = ({ children }) => {
   const isTokenExpired = React.useCallback((token) => {
     if (!token) return true;
 
-    // Check if the token exists in localStorage
     const storedToken = localStorage.getItem('google_access_token');
     if (!storedToken) return true;
 
@@ -40,11 +36,8 @@ export const AuthProvider = ({ children }) => {
 
   const logout = React.useCallback(() => {
     setAccessToken(null);
-    setUser(null);
     localStorage.removeItem('google_access_token');
-    localStorage.removeItem('user_info');
     clearAccessTokenTimer(); // Clear timer on logout
-    // Potentially revoke token on Google's side if needed
   }, []);
 
   const setAccessTokenWithExpiration = (token, expiresIn) => {
@@ -67,32 +60,17 @@ export const AuthProvider = ({ children }) => {
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       setAccessTokenWithExpiration(tokenResponse.access_token, tokenResponse.expires_in);
-      (async () => {
-        try {
-          const userInfoResponse = await axios.get(
-            'https://www.googleapis.com/oauth2/v3/userinfo',
-            { headers: { Authorization: `Bearer ${tokenResponse.access_token}` } },
-          );
-          setUser(userInfoResponse.data);
-          localStorage.setItem('user_info', JSON.stringify(userInfoResponse.data));
-        } catch (error) {
-          console.error("Error fetching user info:", error);
-          setUser(null);
-        }
-      })();
     },
     onError: (error) => {
       console.log('Login Failed:', error);
       setAccessToken(null);
-      setUser(null);
       clearAccessTokenTimer(); // Clear timer on login failure
     },
-    scope: 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
+    scope: 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/gmail.send',
   });
 
   useEffect(() => {
     const storedToken = localStorage.getItem('google_access_token');
-    const storedUser = localStorage.getItem('user_info');
 
     if (storedToken) {
       // If a token is stored, we assume it's still valid for now.
@@ -100,9 +78,6 @@ export const AuthProvider = ({ children }) => {
       // and use it to set the timer here. For now, the token will be
       // considered valid until an API call fails or manual logout.
       setAccessToken(storedToken);
-    }
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
     }
     setLoading(false);
 
@@ -112,8 +87,8 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const contextValue = React.useMemo(
-    () => ({ accessToken, user, login, logout, loading, isTokenExpired }),
-    [accessToken, user, login, logout, loading, isTokenExpired]
+    () => ({ accessToken, login, logout, loading, isTokenExpired }),
+    [accessToken, login, logout, loading, isTokenExpired]
   );
 
   return (
