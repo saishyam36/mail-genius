@@ -14,6 +14,7 @@ import { Route, Routes, Navigate } from 'react-router-dom'
 import EmailInboxProvider from './contexts/EmailInboxContext';
 import { EmailAiProvider } from './contexts/EmailAiContext';
 import { Toaster } from 'sonner';
+import Configurations from './pages/Configurations';
 
 // New component to encapsulate authenticated content
 function AuthAppContent() {
@@ -25,7 +26,7 @@ function AuthAppContent() {
 
   return (
     <SidebarProvider className="flex flex-col h-full">
-      <Toaster position="top-center" richColors closeButton/>
+      <Toaster position="top-center" richColors/>
       <SiteHeader />
       <div className="flex flex-1 overflow-hidden">
         <AppSidebar />
@@ -36,14 +37,14 @@ function AuthAppContent() {
                 <Route path="/login" element={<Login />} />
                 <Route
                   path="/"
-                  element=<EmailGenerator />
+                  element={<EmailGenerator />}
                 />
                 <Route
                   path="/email/inbox"
                   element={accessToken ? <EmailInbox /> : <Navigate to="/login" />}
                 />
+                <Route path="/configuration" element={<Configurations />} />
                 {/* <Route path="/templates" element={<Templates />} /> */}
-                {/* <Route path="/settings" element={<Settings />} /> */}
               </Routes>
             </SidebarInset>
           </EmailAiProvider>

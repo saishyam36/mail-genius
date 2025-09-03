@@ -20,6 +20,7 @@ import {
     Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 } from "@/components/ui/form";
 import { EmailAiContext } from '@/contexts/EmailAiContext'; // Import the AI context
+import { toast } from 'sonner';
 
 const formSchema = z.object({
     subject: z.string().max(70, { message: "Subject cannot exceed 70 characters." }).min(1, { message: "Subject is required." }),
@@ -71,10 +72,11 @@ const EmailGenerator = () => {
 
     const handleCopy = () => {
         navigator.clipboard.writeText(generatedEmail);
+        toast   .success('Email copied to clipboard!');
     };
 
     return (
-        <div className="email-generator-container overflow-y-auto p-4 md:p-8 lg:p-12 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-12 relative z-10">
+        <div className="email-generator-container overflow-y-auto p-4 md:p-8 lg:p-12 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-12 relative">
             <Card className="input-section z-10" style={{
                 background: "radial-gradient(125% 125% at 50% 70%, #fff 40%, #6b7280 100%)",
             }}>

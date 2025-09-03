@@ -54,19 +54,19 @@ export function htmlToPlainText(html) {
 }
 
 export function getSummaryLengthByWordCount(emailContent) {
-    const wordCount = emailContent.trim().split(/\s+/).length;
-    
-    if (wordCount <= 100) {
-        return 'Very Short';
-    } else if (wordCount <= 250) {
-        return 'Short';
-    } else if (wordCount <= 500) {
-        return 'Medium';
-    } else if (wordCount <= 1000) {
-        return 'Long';
-    } else {
-        return 'Very Long (7-10 key points)';
-    }
+  const wordCount = emailContent.trim().split(/\s+/).length;
+
+  if (wordCount <= 100) {
+    return 'Very Short';
+  } else if (wordCount <= 250) {
+    return 'Short';
+  } else if (wordCount <= 500) {
+    return 'Medium';
+  } else if (wordCount <= 1000) {
+    return 'Long';
+  } else {
+    return 'Very Long (7-10 key points)';
+  }
 }
 
 export function cleanHtmlOutput(htmlString) {
@@ -90,7 +90,7 @@ export function cleanHtmlOutput(htmlString) {
 
 // Helper function to decode base64url string
 export const decodeBase64Url = (input) => {
-  return decodeURIComponent(atob(input.replace(/-/g, '+').replace(/_/g, '/')).split('').map(function(c) {
+  return decodeURIComponent(atob(input.replace(/-/g, '+').replace(/_/g, '/')).split('').map(function (c) {
     return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
   }).join(''));
 };
@@ -101,7 +101,7 @@ export const parseEmailContent = (message) => {
   const headers = {};
 
   emailPayload.headers.forEach(header => {
-     headers[header.name] = header.value;
+    headers[header.name] = header.value;
   });
 
   const getParts = (parts) => {

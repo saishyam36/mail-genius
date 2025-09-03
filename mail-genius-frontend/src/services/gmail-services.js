@@ -125,8 +125,6 @@ export const getEmailsInThread = async (accessToken, threadId) => {
     const parsedEmails = [];
 
     // 2. Iterate over each message resource in the thread
-
-    // 2. Iterate over each message resource in the thread
     for (const message of messages) {
       const payload = message.payload;
       const headers = payload.headers || [];
@@ -154,20 +152,20 @@ export const getEmailsInThread = async (accessToken, threadId) => {
         if( name === 'message-id') emailDetails.messageId = header.value;
       }
 
-      // 5. Find and decode the message body
       if (payload.parts) {
         // Handle multipart emails (common case)
         for (const part of payload.parts) {
-          if (part.mimeType === 'text/plain') {
-            emailDetails.body = decodeBase64Url(part.body.data);
+          if (part.mimeType === 'text/html' && !emailDetails.body) {
+            emailDetails.body+= decodeBase64Url(part.body.data);
+            console.log('HTML part found and decoded.');
             break; // Prefer plain text over HTML
           }
-          if (part.mimeType === 'text/html' && !emailDetails.body) {
-            emailDetails.body = decodeBase64Url(part.body.data);
+           if (part.mimeType === 'text/plain') {
+            emailDetails.body+= decodeBase64Url(part.body.data);
+            console.log('Plain text part found and decoded.');
           }
         }
       } else if (payload?.body.data) {
-        // Handle single-part emails
         emailDetails.body = decodeBase64Url(payload.body.data);
       }
 
