@@ -1,8 +1,9 @@
-import React,{ useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../auth/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export default function Login() {
   const { login, accessToken, loading, isTokenExpired, logout } = useAuth();
@@ -12,11 +13,12 @@ export default function Login() {
     if (!loading && accessToken) {
       const isExpired = isTokenExpired(accessToken);
       if (isExpired) {
-        console.log('Token expired. Redirecting to login.');
+        toast.error('Token expired. Redirecting to login.');
         logout();
         navigate('/login');
       } else {
         navigate('/email/inbox');
+        toast.success('Logged in successfully!');
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -19,8 +19,8 @@ export const listEmails = async (accessToken, query = 'in:inbox', maxResults = 3
     });
     return response.data.messages || [];
   } catch (error) {
-    console.error('Error listing emails:', error.response ? error.response.data : error.message);
-    throw error;
+    console.log('Error listing emails:', error.response ? error.response.data : error.message);
+    throw error.response ? error.response.data : error.message;
   }
 };
 
@@ -67,7 +67,6 @@ export const sendReply = async (accessToken, messageId, to, subject, replyText, 
     );
     return response.data;
   } catch (error) {
-    // Provide more detailed error logging
     if (error.response) {
       console.error('Error sending reply - API Response:', error.response.data.error.message);
     } else {

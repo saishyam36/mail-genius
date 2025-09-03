@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState, useContext } from "react";
 import { Search } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,15 +11,16 @@ import { listEmails, getEmailDetails, searchEmails,  } from '../services/gmail-s
 import EmailInboxLoader from '@/components/EmailInboxLoader';
 import { parseEmailContent } from "@/utils/helper";
 import useDebounce from "@/hooks/use-debounce";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 const EmailInbox = () => {
   const { emails, setEmails, setSelectedEmail, selectedEmail, setSummary } = useContext(EmailInboxContext);
-  const { accessToken, loading: authLoading } = useAuth(); // Get accessToken and authLoading from AuthContext
+  const { accessToken, logout, loading: authLoading } = useAuth(); // Get accessToken and authLoading from AuthContext
 
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [inboxLoading, setInboxLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchAndSetEmails = async () => {
@@ -28,7 +28,6 @@ const EmailInbox = () => {
         setInboxLoading(false);
         return;
       }
-      setError(null);
       try {
         let detailedEmails = [];
         if (debouncedSearchTerm) {
@@ -57,9 +56,14 @@ const EmailInbox = () => {
         if (detailedEmails.length > 0 && !selectedEmail) {
           setSelectedEmail(detailedEmails[0]);
         }
-      } catch (err) {
-        console.error("Failed to fetch emails:", err);
-        setError("Failed to load emails. Please try again later.");
+      } catch (error) {
+        console.log("Failed to fetch emails:", error.error.code || error);
+        if (error?.error?.code === 401) {
+          toast.error("Session expired. Please log in again");
+          logout();
+        } else{
+          toast.error("Failed to load emails. Please try again later.");
+        }
       } finally {
         setInboxLoading(false);
       }
@@ -94,15 +98,8 @@ const EmailInbox = () => {
     );
   }
 
-  if (error) {
-    return <div className="flex items-center justify-center h-full text-red-500">{error}</div>;
-  }
-
-  if (!accessToken) {
-    return <div className="flex items-center justify-center h-full text-gray-500">Please log in to view your inbox.</div>;
-  }
-
   return (
+    
     <div className="flex h-full flex-row">
       <div className="w-[300px] shrink-0 border-r">
         <Tabs defaultValue="all" className="flex h-full flex-col ">

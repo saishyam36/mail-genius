@@ -29,8 +29,6 @@ export const AuthProvider = ({ children }) => {
     const expirationDate = new Date(parseInt(storedExpiration));
     const now = new Date();
 
-    console.log('Token expiration check:', { expirationDate, now, isExpired: expirationDate <= now });
-
     return expirationDate <= now;
   }, []);
 
