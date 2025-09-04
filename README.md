@@ -1,14 +1,20 @@
 # 📧 Mail Genius
 *Boost your email productivity with Mail Genius - an AI-powered email generator with seamless Gmail integration*
 
+![last commit](https://img.shields.io/github/last-commit/saishyam36/mail-genius?style=flat&logo=git&logoColor=white&color=0080ff) 
+![languages](https://img.shields.io/github/languages/top/saishyam36/mail-genius?style=flat&color=0080ff)
+![languages](https://img.shields.io/github/languages/count/saishyam36/mail-genius?style=flat&color=0080ff)
+
 ---
 
 ## 🚀 Description
 
-Mail Genius is an intelligent email management application that revolutionizes how you handle your inbox. Powered by advanced AI technology, it seamlessly integrates with Gmail to provide smart email generation, automated replies, grammar refinement, and intelligent email summarization. Whether you're managing a busy inbox or crafting the perfect professional email, Mail Genius enhances your productivity and better workflow efficiency with cutting-edge AI features.
-
+Mail Genius is an intelligent email management application that revolutionizes how you handle your inbox. Powered by advanced AI technology, it seamlessly integrates with Gmail to provide smart email generation, automated replies, grammar refinement, and intelligent email summarization. Whether you're managing a busy inbox or crafting the perfect professional email, Mail Genius enhances your productivity and better workflow efficiency with cutting-edge AI features. 
 
 ---
+
+### **🔮Experience Mail Genius** - [Live Demo](https://mail-genius-eight.vercel.app/)
+
 
 ## ✨ Features
 
@@ -199,6 +205,6 @@ If you find Mail Genius helpful, please consider:
 
 **Built with ❤️ using AI and modern web technologies**
 
-[Website](https://mailgenius.vercel.app) • [Issues](https://github.com/yourusername/mail-genius/issues)
+[Website](https://mail-genius-eight.vercel.app/) • [Issues](https://github.com/yourusername/mail-genius/issues)
 
 </div>
