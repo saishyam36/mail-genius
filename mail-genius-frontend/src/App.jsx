@@ -16,7 +16,6 @@ import { EmailAiProvider } from './contexts/EmailAiContext';
 import { Toaster } from 'sonner';
 import Configurations from './pages/Configurations';
 
-// New component to encapsulate authenticated content
 function AuthAppContent() {
   const { accessToken, loading } = useAuth();
 

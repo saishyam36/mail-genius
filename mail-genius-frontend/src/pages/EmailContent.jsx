@@ -283,6 +283,7 @@ const EmailContent = () => {
               </div>
                 <Separator />
                 <iframe
+                  title="Email Body"
                   className="flex-1 p-4 text-sm overflow-y-auto max-w-full break-words border-none"
                   sandbox="allow-same-origin allow-scripts"
                   srcDoc={email.body}
