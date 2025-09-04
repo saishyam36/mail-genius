@@ -7,6 +7,7 @@
 
 Mail Genius is an intelligent email management application that revolutionizes how you handle your inbox. Powered by advanced AI technology, it seamlessly integrates with Gmail to provide smart email generation, automated replies, grammar refinement, and intelligent email summarization. Whether you're managing a busy inbox or crafting the perfect professional email, Mail Genius enhances your productivity and better workflow efficiency with cutting-edge AI features.
 
+
 ---
 
 ## ✨ Features
@@ -32,13 +33,18 @@ Mail Genius is an intelligent email management application that revolutionizes h
 ## 🛠️ Tech Stack
 
 <div align="center">
-
-| Frontend | AI/ML | Backend APIs | Styling | Build Tools |
-|----------|-------|--------------|---------|-------------|
-| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="40" height="40" alt="React"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg" width="40" height="40" alt="Vertex AI"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" width="40" height="40" alt="Gmail API"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-plain.svg" width="40" height="40" alt="TailwindCSS"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" width="40" height="40" alt="Vite"/> |
-| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" width="40" height="40" alt="JavaScript"/> |  | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/axios/axios-plain.svg" width="40" height="40" alt="Axios"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" width="40" height="40" alt="HTML5"/> |  |
-|  |  |  | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" width="40" height="40" alt="CSS3"/> |  |
-
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="60" height="60" alt="React"/>
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" width="60" height="60" alt="JavaScript"/>
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/reactrouter/reactrouter-original-wordmark.svg" width="60" height="60"/>
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" width="60" height="60" alt="Vite"/>
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg" width="60" height="60" alt="Vertex AI"/>
+<img src="https://avatars.githubusercontent.com/u/139895814?s=200&v=4" width="60" height="60" alt="Shadcn"/>
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg" width="60" height="60" alt="Tailwind CSS"/>          
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" width="60" height="60" alt="HTML5"/>
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" width="60" height="60" alt="CSS3"/>
+<img src="https://img.icons8.com/color/60/000000/gmail-new.png" width="60" height="60" alt="Gmail API"/>
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/axios/axios-plain.svg" width="60" height="60" alt="Axios"/>
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vercel/vercel-original.svg" width="60" height="60" alt="vercel"/>
 </div>
 
 **Core Technologies:**
@@ -135,7 +141,7 @@ npm run lint
 
 | Email Generator | Inbox Management | Reply Editor |
 |----------------|------------------|-------------|
-| ![Email Generator](<img width="1918" height="864" alt="Screenshot 2025-09-04 230252" src="https://github.com/user-attachments/assets/899312ac-fd81-4426-a994-1f08138c6ea1" />) | ![Inbox](<img width="1919" height="860" alt="Screenshot 2025-09-04 230749" src="https://github.com/user-attachments/assets/8bba2c76-153c-484e-b7d9-2a2f6cb46f9f" />)| ![Reply] (<img width="1299" height="801" alt="Screenshot 2025-09-04 230823" src="https://github.com/user-attachments/assets/6ac5b541-3b15-447c-a6c1-ceec286fe838" />)|
+| <img width="1918" height="864" alt="Screenshot 2025-09-04 230252" src="https://github.com/user-attachments/assets/899312ac-fd81-4426-a994-1f08138c6ea1" /> | <img width="1919" height="860" alt="Screenshot 2025-09-04 230749" src="https://github.com/user-attachments/assets/8bba2c76-153c-484e-b7d9-2a2f6cb46f9f" /> | <img width="1299" height="801" alt="Screenshot 2025-09-04 230823" src="https://github.com/user-attachments/assets/6ac5b541-3b15-447c-a6c1-ceec286fe838" /> |
 | AI-powered email creation with customizable tone and creativity | Smart inbox with search and AI features | Smart replies and grammer refinement |
 
 ---
