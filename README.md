@@ -1,4 +1,4 @@
-# 📧 Mail Genius
+# <img width="40" height="40" alt="mail-genius-logo" src="https://github.com/user-attachments/assets/c95ac943-f494-49e7-977d-8f57b886f576"/> Mail Genius
 *Boost your email productivity with Mail Genius - an AI-powered email generator with seamless Gmail integration*
 
 ![last commit](https://img.shields.io/github/last-commit/saishyam36/mail-genius?style=flat&logo=git&logoColor=white&color=0080ff) 
