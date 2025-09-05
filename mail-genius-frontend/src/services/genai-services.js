@@ -1,4 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
+import { geminiModel } from '../utils/constants.js';
 
 let geminiApiKey;
 if (sessionStorage.getItem('geminiApiKey') === null) {
@@ -8,7 +9,7 @@ else {
     geminiApiKey = sessionStorage.getItem('geminiApiKey');
 }
 const ai = new GoogleGenAI({ apiKey: geminiApiKey });
-const model = "gemini-2.0-flash-001";
+const model = geminiModel;
 
 export async function generateContent(formData) {
 

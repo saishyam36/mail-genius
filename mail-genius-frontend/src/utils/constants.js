@@ -39,3 +39,5 @@ export const EMAIL_GENERATOR = {
         EDIT: '✏️',
     },
 };
+
+export const geminiModel = "gemini-2.0-flash-001";
