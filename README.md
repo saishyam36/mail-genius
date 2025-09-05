@@ -57,7 +57,7 @@ Mail Genius is an intelligent email management application that revolutionizes h
 - **Frontend**: React, React Router DOM, Context API
 - **AI Integration**: Google GenAI, Vertex AI (Gemini 2.0 Flash)
 - **Email Services**: Gmail API, Google OAuth 2.0
-- **UI Framework**: Radix UI, Lucide React Icons
+- **UI Framework**: Shadcn UI, Lucide React Icons
 - **Styling**: TailwindCSS, SCSS
 - **Build Tool**: Vite
 - **Rich Text**: Lexical Editor
